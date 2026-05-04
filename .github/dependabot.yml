@@ -1,0 +1,38 @@
+# Dependabot config — weekly review (per audit doc K-03 + H-03).
+version: 2
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'Asia/Jakarta'
+    open-pull-requests-limit: 5
+    labels:
+      - 'dependencies'
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      # Group minor + patch bumps untuk reduce PR noise
+      production-deps:
+        applies-to: version-updates
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+      dev-deps:
+        applies-to: version-updates
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+      timezone: 'Asia/Jakarta'
+    labels:
+      - 'dependencies'
+      - 'github-actions'

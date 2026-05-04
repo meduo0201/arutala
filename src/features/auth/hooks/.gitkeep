@@ -1,0 +1,1 @@
+# Auth hooks: useAuth (session state), useSignIn / useSignUp / useSignOut (mutations).

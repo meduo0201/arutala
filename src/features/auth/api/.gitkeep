@@ -1,0 +1,1 @@
+# Auth API wrappers: signUp, signInWithPassword, signOut, getSession (Supabase calls).

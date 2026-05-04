@@ -1,0 +1,3 @@
+# Cloudflare Pages SPA fallback: route semua URL ke index.html (200 status).
+# Tanpa ini, refresh di /login atau /couple-setup → 404.
+/*  /index.html  200

@@ -1,0 +1,62 @@
+# Security workflow — runs on PR + main push.
+#
+# Coverage (per audit Milestone I, doc §5.8):
+# - typecheck (TS strict)
+# - lint (ESLint)
+# - pnpm audit (HIGH-severity gate)
+# - gitleaks (secret scan)
+#
+# Future: add Semgrep `p/security-audit` + supabase test db (pgTAP for RLS)
+# once deps installed via Phase 4 polish.
+
+name: security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: pnpm audit (HIGH gate)
+        run: pnpm audit --audit-level=high --prod
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
