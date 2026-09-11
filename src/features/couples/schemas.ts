@@ -9,10 +9,10 @@ export const acceptInvitationSchema = z.object({
     .string()
     .trim()
     .toUpperCase()
-    .length(6, 'Code harus 6 karakter.')
+    .length(6, '邀请码须为 6 位。')
     .regex(
       INVITATION_CHARS,
-      'Code cuma boleh huruf besar A-Z (kecuali I, L, O) dan angka 2-9.',
+      '邀请码只能使用大写字母 A–Z（不含 I、L、O）和数字 2–9。',
     ),
 });
 

@@ -1,25 +1,24 @@
 import { format, parseISO } from 'date-fns';
-import { enUS, id as idLocale } from 'date-fns/locale';
+import { zhCN } from 'date-fns/locale';
 import type { Locale } from '@/lib/i18n';
 
-const dateLocales: Record<Locale, typeof enUS> = {
-  id: idLocale,
-  en: enUS,
+const dateLocales: Record<Locale, typeof zhCN> = {
+  'zh-CN': zhCN,
 };
 
 /**
- * Format ISO date string (YYYY-MM-DD) ke locale-aware human-readable.
- * Default pattern "d MMM yyyy" (e.g. "4 Mei 2026" / "May 4, 2026").
+ * Format ISO date string (YYYY-MM-DD) for zh-CN.
+ * Default pattern e.g. "2026年5月4日".
  */
 export const formatDate = (
   isoDate: string,
-  locale: Locale,
-  pattern = 'd MMM yyyy',
+  locale: Locale = 'zh-CN',
+  pattern = 'yyyy年M月d日',
 ): string => {
-  return format(parseISO(isoDate), pattern, { locale: dateLocales[locale] });
+  return format(parseISO(isoDate), pattern, { locale: dateLocales[locale] ?? zhCN });
 };
 
-/** Today as YYYY-MM-DD (local timezone). Buat default `start_date`/`end_date`. */
+/** Today as YYYY-MM-DD (local timezone). */
 export const todayIso = (): string => {
   const now = new Date();
   const yyyy = now.getFullYear();
@@ -28,7 +27,7 @@ export const todayIso = (): string => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
-/** Days between two ISO dates (inclusive). e.g. same date = 1, next day = 2. */
+/** Days between two ISO dates (inclusive). Same date = 1, next day = 2. */
 export const daysBetween = (startIso: string, endIso: string): number => {
   const start = parseISO(startIso);
   const end = parseISO(endIso);

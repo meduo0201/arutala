@@ -19,8 +19,8 @@ export const MoodButton = ({ mood, selected, onToggle }: MoodButtonProps) => {
       onClick={() => onToggle(mood.key)}
       aria-pressed={selected}
       className={cn(
-        'inline-flex flex-col items-center gap-1 px-3 py-2 rounded-lg border transition-colors',
-        'min-w-[64px] hover:bg-muted',
+        'inline-flex flex-col items-center gap-1 px-3 py-2.5 rounded-lg border transition-colors',
+        'min-h-14 min-w-[4.5rem] touch-manipulation hover:bg-muted',
         selected
           ? 'bg-primary/10 border-primary ring-2 ring-primary/30'
           : 'bg-background border-border',

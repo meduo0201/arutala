@@ -28,7 +28,7 @@ export const BottomTabBar = () => {
 
   return (
     <nav
-      aria-label="Primary"
+      aria-label="主导航"
       className={cn(
         'fixed bottom-0 inset-x-0 z-40',
         'border-t border-border bg-background/95 backdrop-blur',
@@ -44,8 +44,8 @@ export const BottomTabBar = () => {
               aria-label={t(labelKey)}
               className={({ isActive }) =>
                 cn(
-                  'flex flex-col items-center justify-center gap-0.5',
-                  'h-16 min-w-16 select-none transition-colors',
+                  'flex flex-col items-center justify-center gap-1',
+                  'h-[4.25rem] min-w-16 select-none touch-manipulation transition-colors',
                   isActive
                     ? 'text-primary'
                     : 'text-muted-foreground hover:text-foreground',
@@ -55,10 +55,10 @@ export const BottomTabBar = () => {
               {({ isActive }) => (
                 <>
                   <Icon
-                    className={cn('size-5', isActive && 'fill-primary/15')}
+                    className={cn('size-6', isActive && 'fill-primary/15')}
                     aria-hidden="true"
                   />
-                  <span className="text-[11px] leading-none font-medium">
+                  <span className="text-xs leading-none font-medium">
                     {t(labelKey)}
                   </span>
                 </>

@@ -1,4 +1,5 @@
 import { Navigate } from 'react-router-dom';
+import { PageShell } from '@/components/layout/page-shell';
 import { AcceptInvitationForm } from '@/features/couples/components/accept-invitation-form';
 import { InvitationCard } from '@/features/couples/components/invitation-card';
 import { useCouple } from '@/features/couples/hooks/use-couple';
@@ -21,21 +22,19 @@ const CoupleSetupPage = () => {
   }
 
   return (
-    <main className="min-h-dvh flex items-start justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {t('couple.setup.title')}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {t('couple.setup.description')}
-          </p>
-        </div>
-
-        <InvitationCard />
-        <AcceptInvitationForm />
+    <PageShell>
+      <div className="text-center space-y-2">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {t('couple.setup.title')}
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          {t('couple.setup.description')}
+        </p>
       </div>
-    </main>
+
+      <InvitationCard />
+      <AcceptInvitationForm />
+    </PageShell>
   );
 };
 

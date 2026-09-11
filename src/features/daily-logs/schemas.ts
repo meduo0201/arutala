@@ -4,7 +4,7 @@ import { FLOW_INTENSITY_VALUES } from '@/features/daily-logs/types';
 // Form schema buat input single daily log. log_date wajib (1 log per couple per
 // hari—DB UNIQUE constraint), field lain optional.
 
-const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Format tanggal harus YYYY-MM-DD.');
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, '日期格式须为 YYYY-MM-DD。');
 
 export const dailyLogFormSchema = z.object({
   log_date: isoDate,
@@ -14,7 +14,7 @@ export const dailyLogFormSchema = z.object({
     .optional(),
   symptoms: z.array(z.string()).default([]),
   moods: z.array(z.string()).default([]),
-  notes: z.string().max(2000, 'Catatan terlalu panjang (maks 2000 karakter).').optional(),
+  notes: z.string().max(2000, '笔记过长（最多 2000 字）。').optional(),
 });
 
 export type DailyLogFormInput = z.infer<typeof dailyLogFormSchema>;

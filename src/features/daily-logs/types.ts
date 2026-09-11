@@ -82,8 +82,37 @@ export interface MoodCatalogRow {
 
 import type { Locale } from '@/lib/i18n';
 
-/** Locale-aware label getter—centralized supaya gak duplicate logic di UI. */
+/** Client-side zh-CN labels. DB still stores label_id / label_en; no schema change. */
+const CATALOG_ZH: Record<string, string> = {
+  cramps: '痛经',
+  headache: '头痛',
+  back_pain: '腰痛',
+  breast_tenderness: '乳房胀痛',
+  bloating: '腹胀',
+  nausea: '恶心',
+  diarrhea: '腹泻',
+  constipation: '便秘',
+  acne: '痘痘',
+  oily_skin: '油皮',
+  fatigue: '疲劳',
+  insomnia: '失眠',
+  food_cravings: '食欲大增',
+  low_libido: '性欲偏低',
+  high_libido: '性欲偏高',
+  happy: '开心',
+  calm: '平静',
+  energetic: '有活力',
+  tired: '疲惫',
+  sad: '难过',
+  anxious: '焦虑',
+  irritable: '易怒',
+  emotional: '情绪波动',
+  confident: '自信',
+  overwhelmed: '压力大',
+};
+
+/** zh-CN label for catalog rows. `locale` kept for call-site compatibility. */
 export const getCatalogLabel = (
-  row: { label_id: string; label_en: string },
-  locale: Locale,
-): string => (locale === 'id' ? row.label_id : row.label_en);
+  row: { key: string; label_id: string; label_en: string },
+  _locale?: Locale,
+): string => CATALOG_ZH[row.key] ?? row.label_en ?? row.label_id;

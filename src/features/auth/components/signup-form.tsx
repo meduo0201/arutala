@@ -272,7 +272,7 @@ export const SignupForm = () => {
           <p className="text-sm text-destructive" role="alert">
             {t('auth.password.pwned').replace(
               '{count}',
-              hibpStatus.count.toLocaleString('id-ID'),
+              hibpStatus.count.toLocaleString('zh-CN'),
             )}
           </p>
         )}

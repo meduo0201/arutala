@@ -23,17 +23,17 @@ export default defineConfig({
       // Bundle public/icons/ ke service worker precache.
       includeAssets: ['icons/*.png'],
       manifest: {
-        name: 'Arutala',
-        short_name: 'Arutala',
+        name: '经期记录',
+        short_name: '经期记录',
         description:
-          'Period & cycle tracker untuk pasangan. Privacy-first, partner mode bawaan.',
+          '面向个人与伴侣的经期与周期记录，隐私优先。',
         theme_color: '#1a0d2e',
         background_color: '#1a0d2e',
         display: 'standalone',
         orientation: 'portrait',
         scope: '/',
         start_url: '/',
-        lang: 'id',
+        lang: 'zh-CN',
         icons: [
           {
             src: '/icons/icon-192.png',

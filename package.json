@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Period & cycle tracker untuk pasangan — privacy-first PWA",
+  "description": "面向个人与伴侣的经期与周期记录 — 隐私优先 PWA",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
