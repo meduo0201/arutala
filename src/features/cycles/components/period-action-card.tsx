@@ -60,6 +60,7 @@ export const PeriodActionCard = () => {
             <span className="font-medium text-foreground">
               {t('cycles.active.day-prefix')}
               {dayN}
+              {t('cycles.active.day-suffix')}
             </span>
           </CardDescription>
         </CardHeader>

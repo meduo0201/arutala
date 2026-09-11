@@ -1,15 +1,10 @@
 import { z } from 'zod';
 
-// Validation schemas untuk auth forms. Reused di API mutations + form resolvers.
-// Error messages Bahasa Indonesia (gen-Z friendly per CLAUDE.md tone).
-
 export const loginSchema = z.object({
-  email: z.string().email('Format email belum valid.'),
-  password: z.string().min(1, 'Password wajib diisi.'),
+  email: z.string().email('邮箱格式不正确。'),
+  password: z.string().min(1, '请填写密码。'),
 });
 
-// Age-gate per UU PDP Pasal 25 — pemrosesan data anak butuh consent ortu/wali,
-// untuk simplicity Arutala block <18.
 const MIN_SIGNUP_AGE = 18;
 const yearsBetween = (start: Date, end: Date): number => {
   let years = end.getFullYear() - start.getFullYear();
@@ -25,40 +20,40 @@ const yearsBetween = (start: Date, end: Date): number => {
 
 export const signupSchema = z
   .object({
-    email: z.string().email('Format email belum valid.'),
+    email: z.string().email('邮箱格式不正确。'),
     displayName: z
       .string()
-      .min(2, 'Nama minimal 2 karakter.')
-      .max(40, 'Nama maks 40 karakter.'),
+      .min(2, '昵称至少 2 个字符。')
+      .max(40, '昵称最多 40 个字符。'),
     password: z
       .string()
-      .min(12, 'Password minimal 12 karakter.')
-      .regex(/[a-z]/, 'Password butuh huruf kecil.')
-      .regex(/[A-Z]/, 'Password butuh huruf besar.')
-      .regex(/\d/, 'Password butuh angka.')
-      .regex(/[^a-zA-Z0-9]/, 'Password butuh simbol (mis. !@#$).'),
-    confirmPassword: z.string().min(1, 'Konfirmasi password wajib diisi.'),
+      .min(12, '密码至少 12 位。')
+      .regex(/[a-z]/, '密码需要包含小写字母。')
+      .regex(/[A-Z]/, '密码需要包含大写字母。')
+      .regex(/\d/, '密码需要包含数字。')
+      .regex(/[^a-zA-Z0-9]/, '密码需要包含符号（如 !@#$）。'),
+    confirmPassword: z.string().min(1, '请再次输入密码。'),
     dateOfBirth: z
       .string()
-      .min(1, 'Tanggal lahir wajib diisi (verifikasi umur ≥18).')
+      .min(1, '请填写出生日期（需年满 18 岁）。')
       .refine(
         (val) => {
           const dob = new Date(val);
           if (Number.isNaN(dob.getTime())) return false;
           return yearsBetween(dob, new Date()) >= MIN_SIGNUP_AGE;
         },
-        { message: 'Umur minimal 18 tahun untuk daftar.' },
+        { message: '注册需年满 18 岁。' },
       ),
     consentCoreProcessing: z.boolean().refine((v) => v === true, {
-      message: 'Persetujuan eksplisit data kesehatan wajib di-centang.',
+      message: '必须勾选健康数据处理同意。',
     }),
     consentCrossBorder: z.boolean().refine((v) => v === true, {
-      message: 'Persetujuan transfer data ke luar negeri wajib di-centang.',
+      message: '必须勾选跨境传输同意。',
     }),
     consentPartnerSharing: z.boolean(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'Password gak sama.',
+    message: '两次密码不一致。',
     path: ['confirmPassword'],
   });
 

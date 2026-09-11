@@ -147,7 +147,7 @@ export const PassphraseSetupDialog = ({
             />
             {confirm && confirm !== passphrase && (
               <p className="text-xs text-destructive">
-                Passphrase gak sama.
+                {t('e2ee.setup.mismatch')}
               </p>
             )}
           </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { zhCN } from 'date-fns/locale';
 import { Calendar } from '@/components/ui/calendar';
 import {
   Card,
@@ -47,6 +48,7 @@ export const CycleCalendar = () => {
         <CardContent className="flex justify-center pb-3">
           <Calendar
             mode="single"
+            locale={zhCN}
             selected={selectedDate}
             onSelect={handleSelect}
             modifiers={{

@@ -40,18 +40,18 @@ import { useTranslation } from '@/lib/i18n';
 
 const isoDate = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Format tanggal harus YYYY-MM-DD.');
+  .regex(/^\d{4}-\d{2}-\d{2}$/, '日期格式须为 YYYY-MM-DD。');
 
 const formSchema = z
   .object({
     start_date: isoDate,
     end_date: z.union([isoDate, z.literal('')]).optional(),
-    notes: z.string().max(500, 'Catatan terlalu panjang (maks 500 karakter).').optional(),
+    notes: z.string().max(500, '备注过长（最多 500 字）。').optional(),
   })
   .refine(
     (data) => !data.end_date || data.end_date >= data.start_date,
     {
-      message: 'Tanggal selesai gak boleh lebih awal dari tanggal mulai.',
+      message: '结束日期不能早于开始日期。',
       path: ['end_date'],
     },
   );

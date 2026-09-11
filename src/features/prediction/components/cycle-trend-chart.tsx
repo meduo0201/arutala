@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { differenceInDays, format, parseISO } from 'date-fns';
-import { enUS, id as idLocale } from 'date-fns/locale';
+import { zhCN } from 'date-fns/locale';
 import {
   CartesianGrid,
   Line,
@@ -19,12 +19,7 @@ import {
 } from '@/components/ui/card';
 import { useCycles } from '@/features/cycles/hooks/use-cycles';
 import { usePrediction } from '@/features/prediction/hooks/use-prediction';
-import { useTranslation, type Locale } from '@/lib/i18n';
-
-const dateLocales: Record<Locale, typeof enUS> = {
-  id: idLocale,
-  en: enUS,
-};
+import { useTranslation } from '@/lib/i18n';
 
 interface ChartDatum {
   cycle: number;
@@ -36,7 +31,7 @@ interface ChartDatum {
 // between consecutive starts. Reference line at avg (per prediction). Hidden
 // kalau <2 cycles.
 export const CycleTrendChart = () => {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
   const cycles = useCycles();
   const { prediction } = usePrediction();
 
@@ -57,14 +52,14 @@ export const CycleTrendChart = () => {
       result.push({
         cycle: i,
         length,
-        label: format(parseISO(sorted[i - 1]!.start_date), 'MMM yy', {
-          locale: dateLocales[locale],
+        label: format(parseISO(sorted[i - 1]!.start_date), 'yy年M月', {
+          locale: zhCN,
         }),
       });
     }
     // Last 6 max untuk chart readability
     return result.slice(-6);
-  }, [cycles.data, locale]);
+  }, [cycles.data]);
 
   if (data.length === 0) return null;
 

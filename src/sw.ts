@@ -48,8 +48,8 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('push', (event) => {
   let data: { title: string; body: string; url?: string; tag?: string } = {
-    title: 'Arutala',
-    body: 'Ada notifikasi baru',
+    title: '经期记录',
+    body: '你有一条新提醒',
   };
 
   try {

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { PageShell } from '@/components/layout/page-shell';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useTranslation, type MessageKey } from '@/lib/i18n';
 import { supabase } from '@/lib/supabase';
@@ -25,7 +26,7 @@ const ChoiceCard = ({ active, titleKey, bodyKey, onClick }: ChoiceCardProps) => 
       type="button"
       onClick={onClick}
       className={cn(
-        'w-full text-left rounded-xl border-2 p-4 transition-all',
+        'w-full min-h-20 text-left rounded-xl border-2 p-4 transition-all',
         'hover:bg-muted/30 active:scale-[0.99] motion-reduce:active:scale-100',
         active
           ? 'border-primary bg-primary/5 shadow-sm'
@@ -79,8 +80,7 @@ const OnboardingRolePage = () => {
   };
 
   return (
-    <main className="min-h-dvh bg-background text-foreground">
-      <div className="max-w-md mx-auto px-4 py-8 space-y-6">
+    <PageShell>
         <header className="space-y-2 text-center">
           <img src="/logo.svg" alt="" aria-hidden="true" className="size-16 mx-auto" />
           <h1 className="text-2xl font-semibold tracking-tight">
@@ -149,8 +149,7 @@ const OnboardingRolePage = () => {
         >
           {busy ? t('onboarding.saving') : t('onboarding.role.next')}
         </Button>
-      </div>
-    </main>
+    </PageShell>
   );
 };
 

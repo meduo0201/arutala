@@ -1,957 +1,518 @@
-// Custom minimal i18n. Trade-off vs paraglide-js: zero deps, no compile step.
-// Type-safety via `as const` lock + `keyof typeof id` union — kalau tambah key di
-// `id` tapi lupa di `en`, TypeScript langsung error di `Record<MessageKey, string>`.
-//
-// Re-evaluate kalau messages catalog growth >200 keys atau butuh plurals/interpolation.
+// Single-locale i18n (zh-CN only). Keep the same `t(key)` API so feature
+// screens stay typed without a compile step. Type-safety: extra keys are
+// rejected by `as const`; missing lookups fail at the call site.
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 
-// Source-of-truth catalog. Key style: `<feature>.<element>` lowercase-kebab.
-const id = {
-  'app.name': 'Arutala',
-  'app.tagline':
-    'Period & cycle tracker untuk pasangan. Privacy-first, partner mode bawaan.',
-  'app.smoke-test': 'Smoke test, design tokens loaded.',
+const zh = {
+  'app.name': '经期记录',
+  'app.tagline': '面向个人与伴侣的经期与周期记录，隐私优先。',
+  'app.smoke-test': '冒烟测试，设计令牌已加载。',
 
   // Auth — fields
-  'auth.field.email': 'Email',
-  'auth.field.password': 'Password',
-  'auth.field.password-confirm': 'Konfirmasi password',
-  'auth.field.display-name': 'Nama panggilan',
-  'auth.field.date-of-birth': 'Tanggal lahir',
-  'auth.field.date-of-birth.hint': 'Verifikasi umur ≥18 (UU PDP Pasal 25)',
+  'auth.field.email': '邮箱',
+  'auth.field.password': '密码',
+  'auth.field.password-confirm': '确认密码',
+  'auth.field.display-name': '昵称',
+  'auth.field.date-of-birth': '出生日期',
+  'auth.field.date-of-birth.hint': '需年满 18 岁（未成年人需监护人同意）',
   'auth.password.help':
-    'Min 12 karakter, kombinasi huruf besar, huruf kecil, angka, dan simbol.',
+    '至少 12 位，需同时包含大写字母、小写字母、数字和符号。',
   'auth.password.pwned':
-    'Password ini muncul di {count} breach data publik. Pilih password yang lebih unik.',
-  'auth.password.checking': 'Cek keamanan password...',
-  'auth.consent.heading': 'Persetujuan pemrosesan data',
+    '此密码曾出现在 {count} 次公开数据泄露中，请换一个更独特的密码。',
+  'auth.password.checking': '正在检查密码安全性…',
+  'auth.consent.heading': '数据处理同意',
   'auth.consent.intro':
-    'Sebelum daftar, berikan persetujuan eksplisit sesuai UU PDP Pasal 22. Tanpa centang yang WAJIB, pendaftaran tidak bisa dilanjutkan.',
-  'auth.consent.privacy-link': 'Baca Privacy Notice',
-  'auth.consent.core-processing.title':
-    'WAJIB: Pemrosesan data kesehatan',
+    '注册前请根据《个人信息保护法》逐项确认。未勾选必选项将无法注册。',
+  'auth.consent.privacy-link': '阅读隐私说明',
+  'auth.consent.core-processing.title': '必选：健康数据处理',
   'auth.consent.core-processing.body':
-    'Saya memberikan persetujuan eksplisit kepada Arutala untuk memproses data kesehatan saya (haid, gejala, mood, catatan) demi fungsi inti pelacakan siklus. Identitas pengendali data tertera di halaman Privacy.',
-  'auth.consent.cross-border.title':
-    'WAJIB: Transfer ke luar negeri',
+    '我明确同意「经期记录」处理我的健康数据（经期、症状、心情、笔记），用于周期记录核心功能。数据处理者身份见隐私页。',
+  'auth.consent.cross-border.title': '必选：跨境传输',
   'auth.consent.cross-border.body':
-    'Saya memberikan persetujuan untuk transfer data ke server di luar Indonesia (Supabase Tokyo dan Cloudflare global).',
-  'auth.consent.partner-sharing.title':
-    'OPSIONAL: Berbagi data ke pasangan',
+    '我同意将数据传输至中国境外服务器（Supabase 东京节点与 Cloudflare 全球节点）。',
+  'auth.consent.partner-sharing.title': '可选：与伴侣共享',
   'auth.consent.partner-sharing.body':
-    'Saya memberikan persetujuan untuk berbagi data kesehatan ke akun pasangan yang saya tautkan (couple mode). Bisa dimatikan kapan saja di Settings.',
+    '我同意将健康数据共享给我关联的伴侣账号。可随时在设置中关闭。',
 
   // Auth — login
-  'auth.login.title': 'Login',
-  'auth.login.description': 'Masuk pakai email + password.',
-  'auth.login.submit': 'Masuk',
-  'auth.login.submitting': 'Masuk…',
-  'auth.login.no-account': 'Belum punya akun?',
+  'auth.login.title': '登录',
+  'auth.login.description': '使用邮箱和密码登录。',
+  'auth.login.submit': '登录',
+  'auth.login.submitting': '登录中…',
+  'auth.login.no-account': '还没有账号？',
 
   // Auth — signup
-  'auth.signup.title': 'Daftar',
-  'auth.signup.description': 'Bikin akun baru di Arutala.',
-  'auth.signup.submit': 'Daftar',
-  'auth.signup.submitting': 'Mendaftar…',
-  'auth.signup.has-account': 'Udah punya akun?',
-  'auth.signup.success-title': 'Akun ke-bikin!',
+  'auth.signup.title': '注册',
+  'auth.signup.description': '创建「经期记录」账号。',
+  'auth.signup.submit': '注册',
+  'auth.signup.submitting': '注册中…',
+  'auth.signup.has-account': '已有账号？',
+  'auth.signup.success-title': '账号已创建',
   'auth.signup.success-body':
-    'Cek email Kamu untuk verifikasi link. Klik link tersebut untuk bisa login.',
-  'auth.signup.success-back-login': 'Balik ke login',
+    '请查收验证邮件，点击链接后再登录。',
+  'auth.signup.success-back-login': '返回登录',
 
   'not-found.title': '404',
-  'not-found.message': 'Halaman tidak ditemukan. Mungkin link-nya salah ketik?',
-  'not-found.back-home': 'Balik ke beranda',
+  'not-found.message': '页面不存在，链接可能输错了。',
+  'not-found.back-home': '返回首页',
 
   // Common
-  'common.loading': 'Memuat…',
+  'common.loading': '加载中…',
+  'common.close': '关闭',
 
   // Home (protected)
-  'home.signed-in-as': 'Login sebagai',
-  'home.sign-out': 'Keluar',
-  'home.signing-out': 'Keluar…',
+  'home.signed-in-as': '当前登录',
+  'home.sign-out': '退出登录',
+  'home.signing-out': '退出中…',
+  'home.fallback-name': '你好',
 
   // Couple — setup page
-  'couple.setup.title': 'Hubungkan akun pasangan',
+  'couple.setup.title': '关联伴侣账号',
   'couple.setup.description':
-    'Sebelum mulai tracking, kamu perlu hubungkan akun ke pasanganmu via code 6 karakter.',
+    '开始记录前，可用 6 位邀请码把账号和伴侣连在一起。',
 
   // Couple — invitation create
-  'couple.invite.title': 'Bikin invitation',
+  'couple.invite.title': '发起邀请',
   'couple.invite.description':
-    'Generate code 6 karakter, share ke pasangan kamu (WhatsApp, dll).',
-  'couple.invite.create-button': 'Bikin code baru',
-  'couple.invite.creating': 'Bikin code…',
-  'couple.invite.your-code': 'Code kamu:',
-  'couple.invite.copy': 'Salin',
-  'couple.invite.copied': 'Tersalin!',
-  'couple.invite.expires': 'Code aktif 7 hari.',
-  'couple.invite.cancel': 'Batalkan',
-  'couple.invite.cancelling': 'Membatalkan…',
+    '生成 6 位邀请码，通过微信等方式发给伴侣。',
+  'couple.invite.create-button': '生成新邀请码',
+  'couple.invite.creating': '生成中…',
+  'couple.invite.your-code': '你的邀请码：',
+  'couple.invite.copy': '复制',
+  'couple.invite.copied': '已复制',
+  'couple.invite.expires': '邀请码 7 天内有效。',
+  'couple.invite.cancel': '取消',
+  'couple.invite.cancelling': '取消中…',
   'couple.invite.cancel-confirm':
-    'Yakin batalkan kode ini? Pasangan Kamu tidak bisa memakai kode lama lagi.',
+    '确定取消这个邀请码？伴侣将无法再使用旧码。',
 
   // Couple — accept invitation
-  'couple.accept.title': 'Punya code?',
-  'couple.accept.description':
-    'Masukin code dari pasangan kamu di sini buat hubungkan akun.',
-  'couple.accept.code-label': 'Code 6 karakter',
-  'couple.accept.submit': 'Hubungkan',
-  'couple.accept.submitting': 'Menghubungkan…',
+  'couple.accept.title': '已有邀请码？',
+  'couple.accept.description': '在这里输入伴侣发给你的邀请码。',
+  'couple.accept.code-label': '6 位邀请码',
+  'couple.accept.submit': '关联',
+  'couple.accept.submitting': '关联中…',
 
   // Couple — status (home display)
-  'couple.partner-prefix': 'Bareng',
-  'couple.unlink': 'Lepas hubungan',
-
-  // Cycles — idle state (no active period)
-  'cycles.idle.title': 'Belum sedang haid',
-  'cycles.idle.description': 'Ketuk tombol di bawah saat haid mulai.',
-
-  // Cycles — active state (period berlangsung)
-  'cycles.active.title': 'Sedang haid',
-  'cycles.active.since': 'Mulai',
-  'cycles.active.day-prefix': 'Hari ke-',
-
-  // Cycles — actions
-  'cycles.action.start-today': 'Period Mulai Hari Ini',
-  'cycles.action.starting': 'Memulai…',
-  'cycles.action.end-today': 'Period Selesai',
-  'cycles.action.ending': 'Menyelesaikan…',
-
-  // Cycles — history list
-  'cycles.history.title': 'Riwayat',
-  'cycles.history.empty': 'Belum ada riwayat haid. Setelah Kamu mencatat pertama kali, akan muncul di sini.',
-  'cycles.history.ongoing': '(berlangsung)',
-  'cycles.history.days-suffix': 'hari',
-  'cycles.history.arrow': '→',
-
-  // Prediction
-  'prediction.title': 'Prediksi',
-  'prediction.insufficient-data':
-    'Butuh minimal 2 catatan haid untuk prediksi. Catat haid Kamu dulu ya.',
-  'prediction.next-start': 'Periode berikutnya',
-  'prediction.ovulation': 'Ovulasi',
-  'prediction.fertile': 'Window subur',
-  'prediction.avg-cycle': 'Rata-rata siklus',
-  'prediction.days-suffix': 'hari',
-  'prediction.based-on': 'Berdasarkan',
-  'prediction.cycles-suffix': 'siklus terakhir',
-  'prediction.confidence-prefix': '±',
-
-  // Calendar
-  'calendar.title': 'Kalender',
-  'calendar.day.full-format': 'EEEE, d MMM yyyy',
-  'calendar.day.period': 'Hari periode',
-  'calendar.day.no-period': 'Bukan hari periode',
-  'calendar.day.today-suffix': '(hari ini)',
-  'calendar.day.edit-cycle': 'Edit periode ini',
-  'calendar.day.start-here': 'Catat periode mulai tanggal ini',
-  'calendar.day.close': 'Tutup',
-
-  // Charts
-  'chart.cycle-trend.title': 'Tren panjang siklus',
-  'chart.cycle-trend.empty': 'Butuh ≥2 siklus untuk lihat tren.',
-  'chart.cycle-trend.tooltip-length': 'Panjang siklus',
-  'chart.cycle-trend.avg-line': 'Rata-rata',
-  'chart.symptom-freq.title': 'Gejala tersering',
-  'chart.symptom-freq.empty': 'Belum ada gejala ke-log. Catat di daily log untuk lihat tren.',
-  'chart.symptom-freq.count-suffix': 'x',
-
-  // Insights
-  'insights.title': 'Insights',
-  'insights.avg-cycle': 'Rata-rata siklus',
-  'insights.variability': 'Variasi',
-  'insights.regularity': 'Keteraturan',
-  'insights.regular': 'Teratur',
-  'insights.irregular': 'Tidak teratur',
-  'insights.regular-hint': 'Variasi <7 hari = teratur per definisi medis.',
-  'insights.irregular-hint': 'Variasi lebih dari 7 hari. Konsultasikan ke dokter jika Kamu khawatir.',
-  'insights.days-suffix': 'hari',
-
-  // Cycle wheel
-  'wheel.day-prefix': 'Hari ke-',
-  'wheel.of': 'dari',
-  'wheel.phase.period': 'Periode',
-  'wheel.phase.follicular': 'Folikuler',
-  'wheel.phase.fertile': 'Subur',
-  'wheel.phase.ovulation': 'Ovulasi',
-  'wheel.phase.luteal': 'Luteal',
-  'wheel.empty': 'Belum ada data siklus. Catat haid pertama Kamu untuk memulai.',
-
-  // Daily log form
-  'daily-log.section.cycle': 'Siklus',
-  'daily-log.section.flow': 'Aliran haid',
-  'daily-log.section.symptoms': 'Gejala',
-  'daily-log.section.moods': 'Mood',
-  'daily-log.section.notes': 'Catatan',
-  'daily-log.notes.placeholder': 'Apa yang kamu rasakan hari ini? (opsional)',
-  'daily-log.flow.0': 'Tidak ada',
-  'daily-log.flow.1': 'Bercak',
-  'daily-log.flow.2': 'Ringan',
-  'daily-log.flow.3': 'Sedang',
-  'daily-log.flow.4': 'Banyak',
-  'daily-log.save': 'Simpan log',
-  'daily-log.saving': 'Menyimpan…',
-  'daily-log.delete': 'Hapus log',
-  'daily-log.delete-confirm': 'Hapus log untuk hari ini?',
-  'daily-log.empty-state': 'Belum ada log untuk hari ini.',
-
-  // Logs page (search + filter)
-  'logs.title': 'Semua log',
-  'logs.search.placeholder': 'Cari di notes…',
-  'logs.filter.symptoms': 'Filter gejala',
-  'logs.filter.clear': 'Reset filter',
-  'logs.results-count': 'log ditemukan',
-  'logs.empty': 'Tidak ada log yang cocok.',
-  'logs.view-all': 'Lihat semua log',
-
-  // Data export
-  'export.title': 'Export data',
-  'export.description': 'Download semua log + siklus sebagai CSV (compatible drip).',
-  'export.button': 'Download CSV',
-  'export.exporting': 'Mengexport…',
-
-  // PWA install
-  'install.title': 'Install Arutala',
-  'install.description':
-    'Pasang ke home screen agar terbuka seperti aplikasi native, siap offline, dan full-screen.',
-  'install.button': 'Install app',
-  'install.installed': 'Sudah terpasang ✓',
-  'install.ios.title': 'Install di iOS',
-  'install.ios.body':
-    'Buka di Safari, tap tombol Share, lalu pilih "Tambahkan ke Layar Utama".',
-
-  // Bottom tab navigation
-  'nav.home': 'Hari Ini',
-  'nav.calendar': 'Kalender',
-  'nav.insights': 'Insights',
-  'nav.settings': 'Saya',
-
-  // Page-level titles for new tab pages
-  'page.calendar.title': 'Kalender',
-  'page.insights.title': 'Insights',
-
-  // Home — slim prediction snapshot
-  'home.snapshot.next-period-in': 'Haid berikutnya',
-  'home.snapshot.days-suffix': 'hari lagi',
-  'home.snapshot.starts-on': 'mulai',
-  'home.snapshot.see-insights': 'Lihat semua insights',
-  'home.snapshot.no-data': 'Belum cukup data prediksi',
-
-  // Home — quick log card (today)
-  'home.today-log.title': 'Log hari ini',
-  'home.today-log.empty': 'Belum ada catatan untuk hari ini.',
-  'home.today-log.has-flow': 'Flow tercatat',
-  'home.today-log.symptoms-count': 'gejala',
-  'home.today-log.moods-count': 'mood',
-  'home.today-log.has-notes': '+ catatan',
-  'home.today-log.button.add': 'Catat sekarang',
-  'home.today-log.button.edit': 'Edit log',
-
-  // Onboarding role selection (Phase 5 J2)
-  'onboarding.role.title': 'Pilih peranmu di Arutala',
-  'onboarding.role.subtitle':
-    'Kamu bisa ganti pilihan ini kapan saja di Settings.',
-  'onboarding.role.tracker.title': 'Tracker',
-  'onboarding.role.tracker.body':
-    'Saya yang mengalami haid dan mencatat siklus, gejala, serta mood. Bisa sendiri atau dengan pasangan.',
-  'onboarding.role.supporter.title': 'Supporter',
-  'onboarding.role.supporter.body':
-    'Saya pasangan yang membantu pelacakan. Lebih banyak membaca dan memberi dukungan saat pasangan membutuhkan.',
-  'onboarding.role.next': 'Lanjut',
-  'onboarding.solo.title': 'Bagaimana Kamu mau memakai Arutala?',
-  'onboarding.solo.subtitle':
-    'Solo: simpan data sendiri. Pasangan: tautkan akun pasangan agar bisa berbagi data.',
-  'onboarding.solo.solo.title': 'Solo dulu',
-  'onboarding.solo.solo.body':
-    'Pelacakan pribadi tanpa pasangan. Kamu bisa tautkan pasangan nanti kapan saja.',
-  'onboarding.solo.couple.title': 'Bersama pasangan',
-  'onboarding.solo.couple.body':
-    'Kamu akan diarahkan ke setup kode undangan agar pasangan bisa terhubung.',
-  'onboarding.error': 'Ada error, coba lagi ya',
-  'onboarding.saving': 'Menyimpan...',
-
-  // Home greeting (Phase 5)
-  'home.greeting.morning': 'Selamat pagi',
-  'home.greeting.afternoon': 'Selamat siang',
-  'home.greeting.evening': 'Selamat sore',
-  'home.greeting.night': 'Selamat malam',
-  'home.role.tracker': 'tracker siklus',
-  'home.role.supporter': 'supporter pasangan',
-  'home.role.solo': 'mode solo',
-  'home.partner-pill.linked': 'Terhubung dengan',
-  'home.partner-pill.solo': 'Tracking solo',
-
-  // Toast notifications (Phase 4 Track D)
-  'toast.period.started': 'Haid berhasil dicatat',
-  'toast.period.ended': 'Haid selesai dicatat',
-  'toast.daily-log.saved': 'Catatan tersimpan',
-  'toast.daily-log.deleted': 'Catatan dihapus',
-  'toast.cycle.saved': 'Haid tersimpan',
-  'toast.cycle.deleted': 'Haid dihapus',
-  'toast.profile.saved': 'Profil tersimpan',
-  'toast.couple.unlinked': 'Pasangan terlepas',
-  'toast.error.generic': 'Terjadi kesalahan, silakan coba lagi.',
-
-  // Sexual activity (E2EE-gated)
-  'sexual-activity.section.title': 'Aktivitas intim (E2EE)',
-  'sexual-activity.gate.not-setup':
-    'Field ini di-encrypt end-to-end. Aktifkan E2EE di Settings dulu sebelum mulai tracking.',
-  'sexual-activity.gate.locked':
-    'E2EE terkunci. Buka kunci di Settings dulu untuk akses field ini.',
-  'sexual-activity.gate.go-to-settings': 'Ke Settings',
-  'sexual-activity.field.active': 'Ada aktivitas hari ini?',
-  'sexual-activity.field.type': 'Pakai kontrasepsi?',
-  'sexual-activity.type.protected': 'Pakai (protected)',
-  'sexual-activity.type.unprotected': 'Tanpa (unprotected)',
-  'sexual-activity.field.intensity': 'Tingkat intensitas',
-  'sexual-activity.intensity.1': 'Ringan',
-  'sexual-activity.intensity.2': 'Sedang',
-  'sexual-activity.intensity.3': 'Tinggi',
-  'sexual-activity.field.notes': 'Catatan tambahan (opsional)',
-  'sexual-activity.error.decrypt': 'Gagal decrypt. Passphrase salah?',
-
-  // Push notifications
-  'push.title': 'Notifikasi push',
-  'push.description':
-    'Pengingat otomatis di lock screen sebelum haid berikutnya. Akan dikirim ke perangkat ini setelah Kamu aktifkan.',
-  'push.status.subscribed': 'Aktif',
-  'push.status.not-subscribed': 'Belum aktif',
-  'push.status.permission-denied': 'Izin diblokir',
-  'push.status.unsupported': 'Tidak didukung browser ini',
-  'push.status.no-key': 'Belum diset (admin config)',
-  'push.button.enable': 'Aktifkan notifikasi',
-  'push.button.enabling': 'Mengaktifkan...',
-  'push.button.disable': 'Matikan notifikasi',
-  'push.permission-denied.help':
-    'Kamu pernah memblokir notifikasi. Buka pengaturan browser, Site permissions, arutala.pages.dev, lalu Allow notifications.',
-  'push.no-key.help':
-    'VAPID public key belum di-set di env. Lihat docs/push-setup.md.',
-  'push.privacy-note':
-    'Privasi: payload notifikasi tidak berisi data sensitif. Hanya "haid berikutnya N hari lagi".',
-
-  // E2EE / passphrase flow
-  'e2ee.title': 'Enkripsi end-to-end (E2EE)',
-  'e2ee.description':
-    'Lapisan keamanan tambahan. Data sensitif (aktivitas intim) dienkripsi di perangkat Kamu sebelum dikirim ke server. Developer pun tidak bisa membaca isinya.',
-  'e2ee.status.not-setup': 'Belum diaktifkan',
-  'e2ee.status.locked': 'Terkunci',
-  'e2ee.status.unlocked': 'Aktif',
-  'e2ee.button.setup': 'Aktifkan E2EE',
-  'e2ee.button.unlock': 'Buka kunci',
-  'e2ee.button.lock': 'Kunci sekarang',
-  'e2ee.button.change-passphrase': 'Ganti passphrase',
-  'e2ee.button.disable': 'Matikan E2EE (hapus data E2EE)',
-  'e2ee.setup.title': 'Setup passphrase E2EE',
-  'e2ee.setup.warning':
-    'PENTING: Jika Kamu lupa passphrase, data E2EE tidak bisa dipulihkan (no backdoor). Pastikan passphrase Kamu kuat dan disimpan di password manager.',
-  'e2ee.setup.passphrase-label': 'Passphrase (min 12 karakter)',
-  'e2ee.setup.confirm-label': 'Konfirmasi passphrase',
-  'e2ee.setup.acknowledge':
-    'Saya paham: kalau lupa passphrase, data E2EE saya hilang permanent.',
-  'e2ee.setup.submit': 'Setup E2EE',
-  'e2ee.setup.processing': 'Setting up... (PBKDF2 600k iterations)',
-  'e2ee.unlock.title': 'Buka kunci E2EE',
-  'e2ee.unlock.passphrase-label': 'Passphrase E2EE',
-  'e2ee.unlock.submit': 'Buka',
-  'e2ee.unlock.processing': 'Membuka...',
-  'e2ee.unlock.error': 'Passphrase salah. Coba lagi.',
-  'e2ee.disable.confirm':
-    'Yakin matikan E2EE? Semua data aktivitas intim yang terenkripsi akan dihapus permanen. Aksi ini tidak bisa dibatalkan.',
-
-  // Delete account flow
-  'delete-account.title': 'Hapus akun',
-  'delete-account.description':
-    'Hapus akun dan semua data Kamu (siklus, catatan harian, profil) dari Arutala. Soft delete 30 hari, lalu hard delete permanen. Hak hapus sesuai UU PDP Pasal 8.',
-  'delete-account.button': 'Hapus akun saya',
-  'delete-account.dialog.title': 'Yakin hapus akun?',
-  'delete-account.dialog.body':
-    'Aksi ini menghapus sementara semua data Kamu (haid, gejala, mood, catatan, link pasangan). Setelah 30 hari, data dihapus permanen dan tidak bisa dipulihkan. Pasangan Kamu (jika ada) akan kehilangan akses ke data couple kalian.',
-  'delete-account.dialog.confirm-label':
-    'Ketik "HAPUS" untuk konfirmasi:',
-  'delete-account.dialog.confirm-keyword': 'HAPUS',
-  'delete-account.dialog.confirm': 'Ya, hapus akun saya',
-  'delete-account.dialog.cancel': 'Batal',
-  'delete-account.deleting': 'Menghapus...',
-
-  // MFA / 2FA
-  'mfa.title': 'Verifikasi 2 langkah (2FA)',
-  'mfa.description':
-    'Tambah lapisan keamanan dengan TOTP authenticator app (Google Authenticator, Authy, 1Password).',
-  'mfa.status.enrolled': 'Aktif',
-  'mfa.status.not-enrolled': 'Belum aktif',
-  'mfa.button.enroll': 'Aktifkan 2FA',
-  'mfa.button.unenroll': 'Nonaktifkan 2FA',
-  'mfa.enroll.scan-instruction':
-    'Scan QR di bawah pakai authenticator app, lalu masukin 6-digit kode untuk verify.',
-  'mfa.enroll.secret-fallback': 'Atau masukin secret manual:',
-  'mfa.enroll.code-label': 'Kode 6-digit dari app',
-  'mfa.enroll.verify': 'Verify & Aktifkan',
-  'mfa.enroll.verifying': 'Verify...',
-  'mfa.enroll.cancel': 'Batal',
-  'mfa.enroll.success': '2FA aktif ✓',
-  'mfa.error.invalid-code': 'Kode salah. Coba lagi.',
-  'mfa.unenroll.confirm': 'Yakin nonaktifkan 2FA?',
-
-  // Privacy notice page
-  'privacy.title': 'Privasi & Data',
-  'privacy.subtitle': 'Pemberitahuan privasi sesuai UU PDP Indonesia',
-  'privacy.intro':
-    'Arutala mengolah data kesehatan reproduksi yang termasuk data spesifik menurut UU PDP. Privacy notice ini mengatur bagaimana data Kamu diproses, disimpan, dan hak-hak Kamu sebagai subjek data.',
-  'privacy.contact': 'Kontak pengendali data',
-  'privacy.section.controller': 'Pengendali Data',
-  'privacy.section.data-types': 'Jenis Data yang Diproses',
-  'privacy.section.purposes': 'Tujuan Pemrosesan',
-  'privacy.section.legal-basis': 'Dasar Hukum',
-  'privacy.section.retention': 'Periode Retensi',
-  'privacy.section.transfer': 'Transfer Luar Negeri',
-  'privacy.section.rights': 'Hak Subjek Data',
-  'privacy.section.contact': 'Kontak & Pertanyaan',
-  'privacy.full-text-link': 'Baca privacy notice lengkap di GitHub repo',
-  'privacy.consent-history': 'Riwayat persetujuan saya',
-  'privacy.consent-purpose.core_processing': 'Pemrosesan inti (data kesehatan)',
-  'privacy.consent-purpose.cross_border_transfer': 'Transfer ke luar negeri (Tokyo + global)',
-  'privacy.consent-purpose.partner_sharing': 'Sharing data ke pasangan',
-  'privacy.consent-purpose.sensitive_data_e2ee': 'Data sensitif dengan E2EE (Phase 4)',
-  'privacy.consent.granted': 'Disetujui',
-  'privacy.consent.withdrawn': 'Dicabut',
-  'privacy.consent.never-set': 'Belum diatur',
-  'privacy.consent.last-event': 'event terakhir',
-
-  // Settings page
-  'settings.title': 'Pengaturan',
-  'settings.back': 'Kembali',
-  'settings.theme.label': 'Tampilan',
-  'settings.theme.dark': 'Mode gelap',
-  'settings.theme.light': 'Mode terang',
-  'settings.language.label': 'Bahasa',
-  'settings.account.title': 'Akun',
-  'settings.account.email': 'Email',
-  'settings.couple.title': 'Pasangan',
-  'settings.profile.title': 'Profil',
-
-  // Profile form
-  'profile.field.display-name': 'Nama panggilan',
-  'profile.field.avatar-emoji': 'Avatar emoji',
-  'profile.save': 'Simpan',
-  'profile.saving': 'Menyimpan…',
-  'profile.saved': 'Tersimpan ✓',
-
-  // Couple unlink
-  'couple.unlink.button': 'Lepas pasangan',
-  'couple.unlink.unlinking': 'Melepas…',
-  'couple.unlink.confirm-title': 'Yakin lepas pasangan?',
-  'couple.unlink.confirm-body':
-    'Setelah lepas, kalian tidak bisa lihat data masing-masing. Riwayat tetap tersimpan di database tetapi tidak bisa diakses dari app. Untuk terhubung lagi, salah satu perlu membuat kode undangan baru.',
-  'couple.unlink.confirm': 'Ya, lepas',
-  'couple.unlink.cancel': 'Batal',
-
-  // Cycles — backdate link + dialog
-  'cycles.action.backdate': 'atau backdate (tanggal lain)',
-  'cycles.dialog.add-title': 'Catat periode',
-  'cycles.dialog.add-description': 'Masukkan tanggal mulai dan tanggal selesai (opsional). Berguna jika lupa mencatat saat itu juga.',
-  'cycles.dialog.edit-title': 'Edit periode',
-  'cycles.dialog.edit-description': 'Update tanggal atau hapus entry.',
-  'cycles.dialog.field.start-date': 'Tanggal mulai',
-  'cycles.dialog.field.end-date': 'Tanggal selesai (opsional)',
-  'cycles.dialog.field.notes': 'Catatan (opsional)',
-  'cycles.dialog.save': 'Simpan',
-  'cycles.dialog.saving': 'Menyimpan…',
-  'cycles.dialog.delete': 'Hapus',
-  'cycles.dialog.delete-confirm': 'Yakin hapus haid ini? Bisa dipulihkan dari history database, tetapi tidak melalui UI.',
-} as const;
-
-export type MessageKey = keyof typeof id;
-export type Locale = 'id' | 'en';
-
-// English mirror — `Record<MessageKey, string>` enforce semua key di-translate.
-const en: Record<MessageKey, string> = {
-  'app.name': 'Arutala',
-  'app.tagline':
-    'Period & cycle tracker for couples. Privacy-first, partner mode by default.',
-  'app.smoke-test': 'Smoke test, design tokens loaded.',
-
-  // Auth — fields
-  'auth.field.email': 'Email',
-  'auth.field.password': 'Password',
-  'auth.field.password-confirm': 'Confirm password',
-  'auth.field.display-name': 'Display name',
-  'auth.field.date-of-birth': 'Date of birth',
-  'auth.field.date-of-birth.hint': 'Age verification ≥18 (UU PDP Article 25)',
-  'auth.password.help':
-    'Min 12 chars; mix of uppercase, lowercase, digit, and symbol required.',
-  'auth.password.pwned':
-    'This password appears in {count} public data breaches. Pick a more unique one.',
-  'auth.password.checking': 'Checking password security...',
-  'auth.consent.heading': 'Data processing consent',
-  'auth.consent.intro':
-    'Before signup, give explicit consent per UU PDP Article 22. Without the REQUIRED checkboxes, signup is blocked.',
-  'auth.consent.privacy-link': 'Read Privacy Notice',
-  'auth.consent.core-processing.title':
-    '✋ REQUIRED — Health data processing',
-  'auth.consent.core-processing.body':
-    'I give explicit consent for Arutala to process my health data (cycle, symptoms, mood, notes) for core cycle-tracking functionality. The data controller identity is shown on the Privacy page.',
-  'auth.consent.cross-border.title':
-    '✋ REQUIRED — Cross-border transfer',
-  'auth.consent.cross-border.body':
-    'I give consent to transfer my data to servers outside Indonesia (Supabase Tokyo + Cloudflare global).',
-  'auth.consent.partner-sharing.title':
-    '💚 OPTIONAL — Partner sharing',
-  'auth.consent.partner-sharing.body':
-    'I give consent to share my health data with the partner account I link (couple mode). Toggleable from Settings.',
-
-  // Auth — login
-  'auth.login.title': 'Login',
-  'auth.login.description': 'Sign in with email + password.',
-  'auth.login.submit': 'Sign in',
-  'auth.login.submitting': 'Signing in…',
-  'auth.login.no-account': "Don't have an account?",
-
-  // Auth — signup
-  'auth.signup.title': 'Sign up',
-  'auth.signup.description': 'Create a new Arutala account.',
-  'auth.signup.submit': 'Sign up',
-  'auth.signup.submitting': 'Signing up…',
-  'auth.signup.has-account': 'Already have an account?',
-  'auth.signup.success-title': 'Account created!',
-  'auth.signup.success-body':
-    'Check your inbox for a verification link. Click it, then sign in.',
-  'auth.signup.success-back-login': 'Back to login',
-
-  'not-found.title': '404',
-  'not-found.message': 'Page not found. Wrong link?',
-  'not-found.back-home': 'Back to home',
-
-  // Common
-  'common.loading': 'Loading…',
-
-  // Home (protected)
-  'home.signed-in-as': 'Signed in as',
-  'home.sign-out': 'Sign out',
-  'home.signing-out': 'Signing out…',
-
-  // Couple — setup page
-  'couple.setup.title': 'Link your partner account',
-  'couple.setup.description':
-    'Before tracking, link your account to your partner via a 6-char code.',
-
-  // Couple — invitation create
-  'couple.invite.title': 'Create invitation',
-  'couple.invite.description':
-    'Generate a 6-char code, share it with your partner (WhatsApp, etc.).',
-  'couple.invite.create-button': 'Generate new code',
-  'couple.invite.creating': 'Generating…',
-  'couple.invite.your-code': 'Your code:',
-  'couple.invite.copy': 'Copy',
-  'couple.invite.copied': 'Copied!',
-  'couple.invite.expires': 'Code valid for 7 days.',
-  'couple.invite.cancel': 'Cancel',
-  'couple.invite.cancelling': 'Cancelling…',
-  'couple.invite.cancel-confirm':
-    'Cancel this code? Your partner can’t use the old code anymore.',
-
-  // Couple — accept invitation
-  'couple.accept.title': 'Got a code?',
-  'couple.accept.description':
-    'Enter the code from your partner here to link accounts.',
-  'couple.accept.code-label': '6-char code',
-  'couple.accept.submit': 'Link',
-  'couple.accept.submitting': 'Linking…',
-
-  // Couple — status (home display)
-  'couple.partner-prefix': 'With',
-  'couple.unlink': 'Unlink',
+  'couple.partner-prefix': '与',
+  'couple.unlink': '解除关联',
 
   // Cycles — idle state
-  'cycles.idle.title': 'Not on period',
-  'cycles.idle.description': 'Tap the button below when your period starts.',
+  'cycles.idle.title': '当前未在经期',
+  'cycles.idle.description': '月经开始时点下面的按钮即可。',
 
   // Cycles — active state
-  'cycles.active.title': 'On period',
-  'cycles.active.since': 'Since',
-  'cycles.active.day-prefix': 'Day ',
+  'cycles.active.title': '正在经期',
+  'cycles.active.since': '开始于',
+  'cycles.active.day-prefix': '第 ',
+  'cycles.active.day-suffix': ' 天',
 
   // Cycles — actions
-  'cycles.action.start-today': 'Period started today',
-  'cycles.action.starting': 'Starting…',
-  'cycles.action.end-today': 'Period ended',
-  'cycles.action.ending': 'Ending…',
+  'cycles.action.start-today': '今天来月经了',
+  'cycles.action.starting': '记录中…',
+  'cycles.action.end-today': '月经结束了',
+  'cycles.action.ending': '记录中…',
 
   // Cycles — history list
-  'cycles.history.title': 'History',
-  'cycles.history.empty': "No period history yet. Once you log your first one, it'll show up here.",
-  'cycles.history.ongoing': '(ongoing)',
-  'cycles.history.days-suffix': 'days',
+  'cycles.history.title': '历史记录',
+  'cycles.history.empty': '还没有经期记录。第一次记录后会出现在这里。',
+  'cycles.history.ongoing': '（进行中）',
+  'cycles.history.days-suffix': '天',
   'cycles.history.arrow': '→',
 
   // Prediction
-  'prediction.title': 'Prediction',
+  'prediction.title': '预测',
   'prediction.insufficient-data':
-    'Need ≥2 logged periods for prediction. Log a period first.',
-  'prediction.next-start': 'Next period',
-  'prediction.ovulation': 'Ovulation',
-  'prediction.fertile': 'Fertile window',
-  'prediction.avg-cycle': 'Avg cycle',
-  'prediction.days-suffix': 'days',
-  'prediction.based-on': 'Based on',
-  'prediction.cycles-suffix': 'recent cycles',
+    '至少需要 2 次经期记录才能预测。先记下一次吧。',
+  'prediction.next-start': '下次月经',
+  'prediction.ovulation': '排卵',
+  'prediction.fertile': '易孕期',
+  'prediction.avg-cycle': '平均周期',
+  'prediction.days-suffix': '天',
+  'prediction.based-on': '基于',
+  'prediction.cycles-suffix': '个近期周期',
   'prediction.confidence-prefix': '±',
 
   // Calendar
-  'calendar.title': 'Calendar',
-  'calendar.day.full-format': 'EEEE, MMM d, yyyy',
-  'calendar.day.period': 'Period day',
-  'calendar.day.no-period': 'Not a period day',
-  'calendar.day.today-suffix': '(today)',
-  'calendar.day.edit-cycle': 'Edit this cycle',
-  'calendar.day.start-here': 'Log period starting on this date',
-  'calendar.day.close': 'Close',
+  'calendar.title': '日历',
+  'calendar.day.full-format': 'yyyy年M月d日 EEEE',
+  'calendar.day.period': '经期日',
+  'calendar.day.no-period': '非经期日',
+  'calendar.day.today-suffix': '（今天）',
+  'calendar.day.edit-cycle': '编辑这次经期',
+  'calendar.day.start-here': '从这天开始记录经期',
+  'calendar.day.close': '关闭',
 
   // Charts
-  'chart.cycle-trend.title': 'Cycle length trend',
-  'chart.cycle-trend.empty': 'Need ≥2 cycles to see the trend.',
-  'chart.cycle-trend.tooltip-length': 'Cycle length',
-  'chart.cycle-trend.avg-line': 'Average',
-  'chart.symptom-freq.title': 'Most frequent symptoms',
-  'chart.symptom-freq.empty': 'No symptoms logged yet. Log them in daily entry to see trends.',
-  'chart.symptom-freq.count-suffix': '×',
+  'chart.cycle-trend.title': '周期长度趋势',
+  'chart.cycle-trend.empty': '至少需要 2 个周期才能看趋势。',
+  'chart.cycle-trend.tooltip-length': '周期长度',
+  'chart.cycle-trend.avg-line': '平均',
+  'chart.symptom-freq.title': '常见症状',
+  'chart.symptom-freq.empty': '还没有症状记录。在每日记录里记下后即可看到趋势。',
+  'chart.symptom-freq.count-suffix': '次',
 
   // Insights
-  'insights.title': 'Insights',
-  'insights.avg-cycle': 'Avg cycle',
-  'insights.variability': 'Variability',
-  'insights.regularity': 'Regularity',
-  'insights.regular': 'Regular',
-  'insights.irregular': 'Irregular',
-  'insights.regular-hint': 'Variability <7 days = regular per medical definition.',
-  'insights.irregular-hint': "Variability >7 days—consult a doctor if you're concerned.",
-  'insights.days-suffix': 'days',
+  'insights.title': '洞察',
+  'insights.avg-cycle': '平均周期',
+  'insights.variability': '波动',
+  'insights.regularity': '规律性',
+  'insights.regular': '规律',
+  'insights.irregular': '不规律',
+  'insights.regular-hint': '波动小于 7 天，一般视为规律。',
+  'insights.irregular-hint': '波动超过 7 天。若你担心，建议咨询医生。',
+  'insights.days-suffix': '天',
+  'insights.daily.title': '今日小贴士',
 
   // Cycle wheel
-  'wheel.day-prefix': 'Day ',
-  'wheel.of': 'of',
-  'wheel.phase.period': 'Period',
-  'wheel.phase.follicular': 'Follicular',
-  'wheel.phase.fertile': 'Fertile',
-  'wheel.phase.ovulation': 'Ovulation',
-  'wheel.phase.luteal': 'Luteal',
-  'wheel.empty': 'No cycle data yet. Log your first period to start.',
+  'wheel.day-prefix': '第 ',
+  'wheel.of': '/',
+  'wheel.phase.period': '经期',
+  'wheel.phase.follicular': '卵泡期',
+  'wheel.phase.fertile': '易孕期',
+  'wheel.phase.ovulation': '排卵',
+  'wheel.phase.luteal': '黄体期',
+  'wheel.empty': '还没有周期数据。记下第一次月经即可开始。',
 
   // Daily log form
-  'daily-log.section.cycle': 'Cycle',
-  'daily-log.section.flow': 'Flow intensity',
-  'daily-log.section.symptoms': 'Symptoms',
-  'daily-log.section.moods': 'Mood',
-  'daily-log.section.notes': 'Notes',
-  'daily-log.notes.placeholder': "What are you feeling today? (optional)",
-  'daily-log.flow.0': 'None',
-  'daily-log.flow.1': 'Spotting',
-  'daily-log.flow.2': 'Light',
-  'daily-log.flow.3': 'Medium',
-  'daily-log.flow.4': 'Heavy',
-  'daily-log.save': 'Save log',
-  'daily-log.saving': 'Saving…',
-  'daily-log.delete': 'Delete log',
-  'daily-log.delete-confirm': 'Delete this day’s log?',
-  'daily-log.empty-state': 'No log for this day yet.',
+  'daily-log.section.cycle': '周期',
+  'daily-log.section.flow': '经血量',
+  'daily-log.section.symptoms': '症状',
+  'daily-log.section.moods': '心情',
+  'daily-log.section.notes': '笔记',
+  'daily-log.notes.placeholder': '今天感觉怎么样？（选填）',
+  'daily-log.flow.0': '没有',
+  'daily-log.flow.1': '点滴',
+  'daily-log.flow.2': '较少',
+  'daily-log.flow.3': '中等',
+  'daily-log.flow.4': '较多',
+  'daily-log.save': '保存记录',
+  'daily-log.saving': '保存中…',
+  'daily-log.delete': '删除记录',
+  'daily-log.delete-confirm': '删除今天的记录？',
+  'daily-log.empty-state': '这一天还没有记录。',
 
-  // Logs page (search + filter)
-  'logs.title': 'All logs',
-  'logs.search.placeholder': 'Search in notes…',
-  'logs.filter.symptoms': 'Filter symptoms',
-  'logs.filter.clear': 'Clear filters',
-  'logs.results-count': 'logs found',
-  'logs.empty': 'No matching logs.',
-  'logs.view-all': 'View all logs',
+  // Logs page
+  'logs.title': '全部记录',
+  'logs.search.placeholder': '搜索笔记…',
+  'logs.filter.symptoms': '按症状筛选',
+  'logs.filter.clear': '清除筛选',
+  'logs.results-count': '条记录',
+  'logs.empty': '没有匹配的记录。',
+  'logs.view-all': '查看全部记录',
 
   // Data export
-  'export.title': 'Export data',
-  'export.description': 'Download all logs + cycles as CSV (drip-compatible).',
-  'export.button': 'Download CSV',
-  'export.exporting': 'Exporting…',
+  'export.title': '导出数据',
+  'export.description': '将全部记录和周期下载为 CSV。',
+  'export.button': '下载 CSV',
+  'export.exporting': '导出中…',
 
   // PWA install
-  'install.title': 'Install Arutala',
+  'install.title': '安装经期记录',
   'install.description':
-    'Install to your home screen for a native-app feel—offline-ready & full-screen.',
-  'install.button': 'Install app',
-  'install.installed': 'Already installed ✓',
-  'install.ios.title': 'Install on iOS',
+    '添加到主屏幕，可全屏打开并支持离线使用。',
+  'install.button': '安装应用',
+  'install.installed': '已安装 ✓',
+  'install.ios.title': '在 iPhone 上安装',
   'install.ios.body':
-    'Open in Safari, tap the Share button, then choose "Add to Home Screen".',
+    '用 Safari 打开，点分享按钮，再选择「添加到主屏幕」。',
 
   // Bottom tab navigation
-  'nav.home': 'Today',
-  'nav.calendar': 'Calendar',
-  'nav.insights': 'Insights',
-  'nav.settings': 'Me',
+  'nav.home': '今天',
+  'nav.calendar': '日历',
+  'nav.insights': '洞察',
+  'nav.settings': '我的',
 
-  // Page-level titles for new tab pages
-  'page.calendar.title': 'Calendar',
-  'page.insights.title': 'Insights',
+  // Page-level titles
+  'page.calendar.title': '日历',
+  'page.insights.title': '洞察',
 
   // Home — slim prediction snapshot
-  'home.snapshot.next-period-in': 'Next period in',
-  'home.snapshot.days-suffix': 'days',
-  'home.snapshot.starts-on': 'starts',
-  'home.snapshot.see-insights': 'See all insights',
-  'home.snapshot.no-data': 'Not enough data for prediction yet',
+  'home.snapshot.next-period-in': '下次月经还有',
+  'home.snapshot.days-suffix': '天',
+  'home.snapshot.starts-on': '预计',
+  'home.snapshot.see-insights': '查看全部洞察',
+  'home.snapshot.no-data': '预测数据还不够',
 
-  // Home — quick log card (today)
-  'home.today-log.title': "Today's log",
-  'home.today-log.empty': 'No entry yet for today.',
-  'home.today-log.has-flow': 'Flow logged',
-  'home.today-log.symptoms-count': 'symptoms',
-  'home.today-log.moods-count': 'moods',
-  'home.today-log.has-notes': '+ notes',
-  'home.today-log.button.add': 'Log now',
-  'home.today-log.button.edit': 'Edit log',
+  // Home — quick log card
+  'home.today-log.title': '今日记录',
+  'home.today-log.empty': '今天还没有记录。',
+  'home.today-log.has-flow': '已记经血量',
+  'home.today-log.symptoms-count': '个症状',
+  'home.today-log.moods-count': '种心情',
+  'home.today-log.has-notes': '+ 笔记',
+  'home.today-log.button.add': '现在记录',
+  'home.today-log.button.edit': '编辑记录',
 
-  // Onboarding role selection (Phase 5 J2)
-  'onboarding.role.title': 'Pick your role in Arutala',
-  'onboarding.role.subtitle':
-    'You can change this in Settings anytime.',
-  'onboarding.role.tracker.title': 'Tracker',
+  // Onboarding role selection
+  'onboarding.role.title': '选择你在这里的角色',
+  'onboarding.role.subtitle': '之后可随时在设置中更改。',
+  'onboarding.role.tracker.title': '记录者',
   'onboarding.role.tracker.body':
-    "I'm the one who has periods + logs cycle, symptoms, mood. Can go solo or with a partner.",
-  'onboarding.role.supporter.title': 'Supporter',
+    '我本人会来月经，负责记录周期、症状和心情。可以自己用，也可以和伴侣一起。',
+  'onboarding.role.supporter.title': '陪伴者',
   'onboarding.role.supporter.body':
-    "I'm a partner helping with tracking. Read-mostly, give support when needed.",
-  'onboarding.role.next': 'Continue',
-  'onboarding.solo.title': 'How do you want to use Arutala?',
+    '我是伴侣，主要查看并在需要时给予支持。',
+  'onboarding.role.next': '继续',
+  'onboarding.solo.title': '你想怎么使用？',
   'onboarding.solo.subtitle':
-    'Solo = your own private tracking. Partnered = link a partner account to share data.',
-  'onboarding.solo.solo.title': 'Solo for now',
+    '独自使用：数据只留在自己账号。和伴侣一起：关联后可共享记录。',
+  'onboarding.solo.solo.title': '先自己用',
   'onboarding.solo.solo.body':
-    'Personal tracking without a partner. You can link one anytime later.',
-  'onboarding.solo.couple.title': 'With a partner',
+    '个人记录，不关联伴侣。以后随时可以再邀请。',
+  'onboarding.solo.couple.title': '和伴侣一起',
   'onboarding.solo.couple.body':
-    "Next: set up an invitation code so your partner can link.",
-  'onboarding.error': 'Something went wrong, try again',
-  'onboarding.saving': 'Saving...',
+    '下一步会进入邀请码设置，方便伴侣关联。',
+  'onboarding.error': '出错了，请再试一次',
+  'onboarding.saving': '保存中…',
 
-  // Home greeting (Phase 5)
-  'home.greeting.morning': 'Good morning',
-  'home.greeting.afternoon': 'Good afternoon',
-  'home.greeting.evening': 'Good evening',
-  'home.greeting.night': 'Good night',
-  'home.role.tracker': 'cycle tracker',
-  'home.role.supporter': 'partner supporter',
-  'home.role.solo': 'solo mode',
-  'home.partner-pill.linked': 'Linked with',
-  'home.partner-pill.solo': 'Tracking solo',
+  // Home greeting
+  'home.greeting.morning': '早上好',
+  'home.greeting.afternoon': '下午好',
+  'home.greeting.evening': '晚上好',
+  'home.greeting.night': '夜深了',
+  'home.role.tracker': '周期记录',
+  'home.role.supporter': '伴侣陪伴',
+  'home.role.solo': '独自使用',
+  'home.partner-pill.linked': '已关联',
+  'home.partner-pill.solo': '独自记录',
 
-  // Toast notifications (Phase 4 Track D)
-  'toast.period.started': 'Period logged',
-  'toast.period.ended': 'Period ended',
-  'toast.daily-log.saved': 'Log saved',
-  'toast.daily-log.deleted': 'Log deleted',
-  'toast.cycle.saved': 'Cycle saved',
-  'toast.cycle.deleted': 'Cycle deleted',
-  'toast.profile.saved': 'Profile saved',
-  'toast.couple.unlinked': 'Partner unlinked',
-  'toast.error.generic': 'Something went wrong, please try again.',
+  // Toast notifications
+  'toast.period.started': '已记下月经开始',
+  'toast.period.ended': '已记下月经结束',
+  'toast.daily-log.saved': '记录已保存',
+  'toast.daily-log.deleted': '记录已删除',
+  'toast.cycle.saved': '经期已保存',
+  'toast.cycle.deleted': '经期已删除',
+  'toast.profile.saved': '资料已保存',
+  'toast.couple.unlinked': '已解除伴侣关联',
+  'toast.error.generic': '出错了，请再试一次。',
 
   // Sexual activity (E2EE-gated)
-  'sexual-activity.section.title': 'Intimate activity (E2EE)',
+  'sexual-activity.section.title': '亲密活动（端到端加密）',
   'sexual-activity.gate.not-setup':
-    'This field is end-to-end encrypted. Enable E2EE in Settings before tracking.',
+    '此栏位会在本机加密。请先在设置中开启端到端加密。',
   'sexual-activity.gate.locked':
-    'E2EE is locked. Unlock in Settings to access this field.',
-  'sexual-activity.gate.go-to-settings': 'Go to Settings',
-  'sexual-activity.field.active': 'Activity today?',
-  'sexual-activity.field.type': 'Used contraception?',
-  'sexual-activity.type.protected': 'Yes (protected)',
-  'sexual-activity.type.unprotected': 'No (unprotected)',
-  'sexual-activity.field.intensity': 'Intensity',
-  'sexual-activity.intensity.1': 'Light',
-  'sexual-activity.intensity.2': 'Medium',
-  'sexual-activity.intensity.3': 'High',
-  'sexual-activity.field.notes': 'Additional notes (optional)',
-  'sexual-activity.error.decrypt': 'Decryption failed — wrong passphrase?',
+    '端到端加密已锁定。请先到设置中解锁。',
+  'sexual-activity.gate.go-to-settings': '前往设置',
+  'sexual-activity.field.active': '今天有亲密活动吗？',
+  'sexual-activity.field.type': '是否采取避孕措施？',
+  'sexual-activity.type.protected': '有（保护）',
+  'sexual-activity.type.unprotected': '没有（未保护）',
+  'sexual-activity.field.intensity': '强度',
+  'sexual-activity.intensity.1': '较轻',
+  'sexual-activity.intensity.2': '中等',
+  'sexual-activity.intensity.3': '较强',
+  'sexual-activity.field.notes': '补充说明（选填）',
+  'sexual-activity.error.decrypt': '解密失败，口令是否正确？',
 
   // Push notifications
-  'push.title': 'Push notifications',
+  'push.title': '推送通知',
   'push.description':
-    'Auto reminders on lock screen before next period. Sent to this device after you enable.',
-  'push.status.subscribed': 'Active',
-  'push.status.not-subscribed': 'Not enabled',
-  'push.status.permission-denied': 'Permission blocked',
-  'push.status.unsupported': 'Not supported by this browser',
-  'push.status.no-key': 'Not set (admin config)',
-  'push.button.enable': 'Enable notifications',
-  'push.button.enabling': 'Enabling...',
-  'push.button.disable': 'Disable notifications',
+    '下次月经前在锁屏显示提醒。开启后会发送到这台设备。',
+  'push.status.subscribed': '已开启',
+  'push.status.not-subscribed': '未开启',
+  'push.status.permission-denied': '权限被拒绝',
+  'push.status.unsupported': '当前浏览器不支持',
+  'push.status.no-key': '尚未配置（管理员）',
+  'push.button.enable': '开启通知',
+  'push.button.enabling': '开启中…',
+  'push.button.disable': '关闭通知',
   'push.permission-denied.help':
-    "You blocked notifications earlier. Open browser settings → Site permissions → arutala.pages.dev → Allow notifications.",
+    '你之前拒绝了通知。请到浏览器设置 → 网站权限 → 本站，允许通知。',
   'push.no-key.help':
-    'VAPID public key not set in env. See docs/push-setup.md.',
+    '环境变量中尚未配置 VAPID 公钥。参见 docs/push-setup.md。',
   'push.privacy-note':
-    'Privacy: notification payload contains no sensitive data (just "Period in N days").',
+    '隐私：通知内容不含敏感健康数据，只会提示「下次月经还有 N 天」。',
 
   // E2EE / passphrase flow
-  'e2ee.title': 'End-to-end encryption (E2EE)',
+  'e2ee.title': '端到端加密',
   'e2ee.description':
-    'Extra layer: sensitive data (intimate activity) is encrypted on your device before sending to server. Even the developer can\'t read it.',
-  'e2ee.status.not-setup': 'Not enabled',
-  'e2ee.status.locked': 'Locked',
-  'e2ee.status.unlocked': 'Active',
-  'e2ee.button.setup': 'Enable E2EE',
-  'e2ee.button.unlock': 'Unlock',
-  'e2ee.button.lock': 'Lock now',
-  'e2ee.button.change-passphrase': 'Change passphrase',
-  'e2ee.button.disable': 'Disable E2EE (clear E2EE data)',
-  'e2ee.setup.title': 'Setup E2EE passphrase',
+    '额外安全层。敏感数据（亲密活动）会在本机加密后再上传，开发者也无法查看。',
+  'e2ee.status.not-setup': '未开启',
+  'e2ee.status.locked': '已锁定',
+  'e2ee.status.unlocked': '已开启',
+  'e2ee.button.setup': '开启端到端加密',
+  'e2ee.button.unlock': '解锁',
+  'e2ee.button.lock': '立即锁定',
+  'e2ee.button.change-passphrase': '更换口令',
+  'e2ee.button.disable': '关闭加密（清除加密数据）',
+  'e2ee.setup.title': '设置加密口令',
   'e2ee.setup.warning':
-    '⚠️ IMPORTANT: If you forget your passphrase, E2EE data CANNOT be recovered (no backdoor). Use a strong passphrase you can remember or save in a password manager.',
-  'e2ee.setup.passphrase-label': 'Passphrase (min 12 chars)',
-  'e2ee.setup.confirm-label': 'Confirm passphrase',
+    '重要：忘记口令后，加密数据无法恢复（没有后门）。请使用强口令并保存在密码管理器中。',
+  'e2ee.setup.passphrase-label': '口令（至少 12 位）',
+  'e2ee.setup.confirm-label': '确认口令',
   'e2ee.setup.acknowledge':
-    'I understand: if I forget the passphrase, my E2EE data is permanently lost.',
-  'e2ee.setup.submit': 'Setup E2EE',
-  'e2ee.setup.processing': 'Setting up... (PBKDF2 600k iterations)',
-  'e2ee.unlock.title': 'Unlock E2EE',
-  'e2ee.unlock.passphrase-label': 'E2EE passphrase',
-  'e2ee.unlock.submit': 'Unlock',
-  'e2ee.unlock.processing': 'Unlocking...',
-  'e2ee.unlock.error': 'Wrong passphrase. Try again.',
+    '我明白：如果忘记口令，加密数据将永久丢失。',
+  'e2ee.setup.submit': '完成设置',
+  'e2ee.setup.processing': '正在设置…（PBKDF2 60 万次迭代）',
+  'e2ee.setup.mismatch': '两次口令不一致。',
+  'e2ee.unlock.title': '解锁端到端加密',
+  'e2ee.unlock.passphrase-label': '加密口令',
+  'e2ee.unlock.submit': '解锁',
+  'e2ee.unlock.processing': '解锁中…',
+  'e2ee.unlock.error': '口令不正确，请重试。',
   'e2ee.disable.confirm':
-    'Disable E2EE? All encrypted intimate activity data will be permanently cleared. Cannot be undone.',
+    '确定关闭端到端加密？所有已加密的亲密活动数据将被永久清除，无法撤销。',
 
   // Delete account flow
-  'delete-account.title': 'Delete account',
+  'delete-account.title': '删除账号',
   'delete-account.description':
-    'Delete your account + all data (cycles, daily logs, profile) from Arutala. Soft delete for 30 days → then permanent. Right to erasure per UU PDP Article 8.',
-  'delete-account.button': 'Delete my account',
-  'delete-account.dialog.title': 'Delete account?',
+    '删除账号及全部数据（周期、每日记录、资料）。先软删除 30 天，再永久清除。符合《个人信息保护法》删除权。',
+  'delete-account.button': '删除我的账号',
+  'delete-account.dialog.title': '确定删除账号？',
   'delete-account.dialog.body':
-    'This action soft-deletes all your data (period, symptoms, mood, notes, partner link). After 30 days, data is permanently erased and unrecoverable. Your partner (if any) will lose access to your shared couple data.',
-  'delete-account.dialog.confirm-label':
-    'Type "DELETE" to confirm:',
-  'delete-account.dialog.confirm-keyword': 'DELETE',
-  'delete-account.dialog.confirm': 'Yes, delete my account',
-  'delete-account.dialog.cancel': 'Cancel',
-  'delete-account.deleting': 'Deleting...',
+    '此操作会暂时删除你的全部数据（经期、症状、心情、笔记、伴侣关联）。30 天后永久清除且无法恢复。若有伴侣，对方将无法再访问共享数据。',
+  'delete-account.dialog.confirm-label': '请输入「删除」以确认：',
+  'delete-account.dialog.confirm-keyword': '删除',
+  'delete-account.dialog.confirm': '是的，删除我的账号',
+  'delete-account.dialog.cancel': '取消',
+  'delete-account.deleting': '删除中…',
 
   // MFA / 2FA
-  'mfa.title': '2-step verification (2FA)',
+  'mfa.title': '两步验证（2FA）',
   'mfa.description':
-    'Add an extra security layer with a TOTP authenticator app (Google Authenticator, Authy, 1Password).',
-  'mfa.status.enrolled': 'Enabled',
-  'mfa.status.not-enrolled': 'Not enabled',
-  'mfa.button.enroll': 'Enable 2FA',
-  'mfa.button.unenroll': 'Disable 2FA',
+    '使用验证器应用（如 Google Authenticator、Authy、1Password）增加一层保护。',
+  'mfa.status.enrolled': '已开启',
+  'mfa.status.not-enrolled': '未开启',
+  'mfa.button.enroll': '开启两步验证',
+  'mfa.button.unenroll': '关闭两步验证',
   'mfa.enroll.scan-instruction':
-    'Scan the QR below with your authenticator app, then enter the 6-digit code to verify.',
-  'mfa.enroll.secret-fallback': 'Or enter the secret manually:',
-  'mfa.enroll.code-label': '6-digit code from app',
-  'mfa.enroll.verify': 'Verify & Enable',
-  'mfa.enroll.verifying': 'Verifying...',
-  'mfa.enroll.cancel': 'Cancel',
-  'mfa.enroll.success': '2FA enabled ✓',
-  'mfa.error.invalid-code': 'Wrong code. Try again.',
-  'mfa.unenroll.confirm': 'Disable 2FA?',
+    '用验证器应用扫描下方二维码，再输入 6 位验证码。',
+  'mfa.enroll.secret-fallback': '或手动输入密钥：',
+  'mfa.enroll.code-label': '应用中的 6 位验证码',
+  'mfa.enroll.verify': '验证并开启',
+  'mfa.enroll.verifying': '验证中…',
+  'mfa.enroll.cancel': '取消',
+  'mfa.enroll.success': '两步验证已开启 ✓',
+  'mfa.error.invalid-code': '验证码不正确，请重试。',
+  'mfa.unenroll.confirm': '确定关闭两步验证？',
 
   // Privacy notice page
-  'privacy.title': 'Privacy & Data',
-  'privacy.subtitle': 'Privacy notice per Indonesia Personal Data Protection Law',
+  'privacy.title': '隐私与数据',
+  'privacy.subtitle': '依据《中华人民共和国个人信息保护法》的隐私说明',
   'privacy.intro':
-    'Arutala processes reproductive health data, classified as specific data under UU PDP. This privacy notice covers how your data is processed, stored, and your rights as a data subject.',
-  'privacy.contact': 'Data controller contact',
-  'privacy.section.controller': 'Data Controller',
-  'privacy.section.data-types': 'Data Processed',
-  'privacy.section.purposes': 'Processing Purposes',
-  'privacy.section.legal-basis': 'Legal Basis',
-  'privacy.section.retention': 'Retention Period',
-  'privacy.section.transfer': 'Cross-Border Transfer',
-  'privacy.section.rights': 'Data Subject Rights',
-  'privacy.section.contact': 'Contact & Questions',
-  'privacy.full-text-link': 'Read full privacy notice on GitHub repo',
-  'privacy.consent-history': 'My consent history',
-  'privacy.consent-purpose.core_processing': 'Core processing (health data)',
-  'privacy.consent-purpose.cross_border_transfer': 'Cross-border transfer (Tokyo + global)',
-  'privacy.consent-purpose.partner_sharing': 'Share data with partner',
-  'privacy.consent-purpose.sensitive_data_e2ee': 'Sensitive data with E2EE (Phase 4)',
-  'privacy.consent.granted': 'Granted',
-  'privacy.consent.withdrawn': 'Withdrawn',
-  'privacy.consent.never-set': 'Not set',
-  'privacy.consent.last-event': 'last event',
+    '「经期记录」处理生殖健康相关个人信息，属于敏感个人信息。本说明介绍数据如何被处理、存储，以及你作为个人的权利。',
+  'privacy.contact': '数据处理者联系方式',
+  'privacy.section.controller': '数据处理者',
+  'privacy.section.data-types': '处理的数据类型',
+  'privacy.section.purposes': '处理目的',
+  'privacy.section.legal-basis': '处理依据',
+  'privacy.section.retention': '保存期限',
+  'privacy.section.transfer': '跨境传输',
+  'privacy.section.rights': '你的权利',
+  'privacy.section.contact': '联系与问询',
+  'privacy.full-text-link': '阅读完整隐私说明',
+  'privacy.consent-history': '我的同意记录',
+  'privacy.consent-purpose.core_processing': '核心处理（健康数据）',
+  'privacy.consent-purpose.cross_border_transfer': '跨境传输（东京 + 全球节点）',
+  'privacy.consent-purpose.partner_sharing': '与伴侣共享数据',
+  'privacy.consent-purpose.sensitive_data_e2ee': '端到端加密的敏感数据',
+  'privacy.consent.granted': '已同意',
+  'privacy.consent.withdrawn': '已撤回',
+  'privacy.consent.never-set': '尚未设置',
+  'privacy.consent.last-event': '最近一次',
+  'privacy.controller.name-label': '名称',
+  'privacy.controller.email-label': '邮箱',
+  'privacy.controller.status-label': '身份',
+  'privacy.controller.status-value': '个人开发者（非法人实体）',
+  'privacy.controller.placeholder-name': '[数据处理者名称]',
+  'privacy.data.general': '一般信息：',
+  'privacy.data.general-1': '邮箱、昵称、头像表情',
+  'privacy.data.general-2': '活动时间（登录、最近使用）',
+  'privacy.data.sensitive': '敏感个人信息（生殖健康）：',
+  'privacy.data.sensitive-1': '月经起止日期、经血量',
+  'privacy.data.sensitive-2': '身体症状（痛经、头痛、痘痘等）',
+  'privacy.data.sensitive-3': '情绪记录',
+  'privacy.data.sensitive-4': '每日笔记（自由文本）',
+  'privacy.purposes.body':
+    '你的数据仅用于：（1）周期记录核心功能；（2）与已关联伴侣共享；（3）账号安全通知；（4）备份与恢复。',
+  'privacy.purposes.disclaimer':
+    '不做广告、不为广告做画像、不向第三方出售，也不用于训练 AI 模型。',
+  'privacy.legal.body':
+    '因为涉及健康类敏感个人信息，处理依据是你的单独同意，而非合同履行或正当利益。',
+  'privacy.retention.1': '账号有效期间持续保存',
+  'privacy.retention.2': '删除账号后：软删除 30 天，再永久清除',
+  'privacy.retention.3': 'Supabase 时间点恢复备份：滚动 7 天',
+  'privacy.retention.4': '登录日志（IP、浏览器信息）：30 天',
+  'privacy.transfer.body':
+    '数据存储在中国境外：Supabase 东京（主数据库）与 Cloudflare（全球边缘、TLS）。跨境传输需你单独同意。',
+  'privacy.rights.1': '查阅权（设置中可导出 CSV）',
+  'privacy.rights.2': '更正权（可在应用内直接编辑）',
+  'privacy.rights.3': '删除权（设置 → 删除账号）',
+  'privacy.rights.4': '可携带权（CSV 格式）',
+  'privacy.rights.5': '撤回同意（设置中开关）',
+  'privacy.rights.6': '依法投诉或寻求救济',
+  'privacy.rights.sla': '查阅请求将在收到邮件后 3×24 小时内回复。',
 
   // Settings page
-  'settings.title': 'Settings',
-  'settings.back': 'Back',
-  'settings.theme.label': 'Theme',
-  'settings.theme.dark': 'Dark mode',
-  'settings.theme.light': 'Light mode',
-  'settings.language.label': 'Language',
-  'settings.account.title': 'Account',
-  'settings.account.email': 'Email',
-  'settings.couple.title': 'Partner',
-  'settings.profile.title': 'Profile',
+  'settings.title': '设置',
+  'settings.back': '返回',
+  'settings.theme.label': '外观',
+  'settings.theme.dark': '深色模式',
+  'settings.theme.light': '浅色模式',
+  'settings.language.label': '语言',
+  'settings.account.title': '账号',
+  'settings.account.email': '邮箱',
+  'settings.couple.title': '伴侣',
+  'settings.profile.title': '资料',
 
   // Profile form
-  'profile.field.display-name': 'Display name',
-  'profile.field.avatar-emoji': 'Avatar emoji',
-  'profile.save': 'Save',
-  'profile.saving': 'Saving…',
-  'profile.saved': 'Saved ✓',
+  'profile.field.display-name': '昵称',
+  'profile.field.avatar-emoji': '头像表情',
+  'profile.save': '保存',
+  'profile.saving': '保存中…',
+  'profile.saved': '已保存 ✓',
 
   // Couple unlink
-  'couple.unlink.button': 'Unlink partner',
-  'couple.unlink.unlinking': 'Unlinking…',
-  'couple.unlink.confirm-title': 'Unlink partner?',
+  'couple.unlink.button': '解除伴侣关联',
+  'couple.unlink.unlinking': '解除中…',
+  'couple.unlink.confirm-title': '确定解除关联？',
   'couple.unlink.confirm-body':
-    "Once unlinked, neither of you can see each other's data. History stays in the database but won't be accessible from the app. If you want to link again, one of you must create a new invitation code.",
-  'couple.unlink.confirm': 'Yes, unlink',
-  'couple.unlink.cancel': 'Cancel',
+    '解除后双方都无法再查看对方数据。历史仍保留在数据库中，但应用内不可见。若要重新关联，需要一方再生成邀请码。',
+  'couple.unlink.confirm': '是的，解除',
+  'couple.unlink.cancel': '取消',
 
   // Cycles — backdate link + dialog
-  'cycles.action.backdate': 'or backdate (custom date)',
-  'cycles.dialog.add-title': 'Log a period',
-  'cycles.dialog.add-description': 'Enter the start date (and optional end date). Useful when you forget to log in realtime.',
-  'cycles.dialog.edit-title': 'Edit period',
-  'cycles.dialog.edit-description': 'Update dates or delete this entry.',
-  'cycles.dialog.field.start-date': 'Start date',
-  'cycles.dialog.field.end-date': 'End date (optional)',
-  'cycles.dialog.field.notes': 'Notes (optional)',
-  'cycles.dialog.save': 'Save',
-  'cycles.dialog.saving': 'Saving…',
-  'cycles.dialog.delete': 'Delete',
-  'cycles.dialog.delete-confirm': 'Delete this period? Restorable from DB history but not via UI.',
-};
+  'cycles.action.backdate': '或补记其他日期',
+  'cycles.dialog.add-title': '记录经期',
+  'cycles.dialog.add-description':
+    '填写开始日期和结束日期（选填）。适合事后补记。',
+  'cycles.dialog.edit-title': '编辑经期',
+  'cycles.dialog.edit-description': '更新日期或删除这条记录。',
+  'cycles.dialog.field.start-date': '开始日期',
+  'cycles.dialog.field.end-date': '结束日期（选填）',
+  'cycles.dialog.field.notes': '备注（选填）',
+  'cycles.dialog.save': '保存',
+  'cycles.dialog.saving': '保存中…',
+  'cycles.dialog.delete': '删除',
+  'cycles.dialog.delete-confirm':
+    '确定删除这次经期？可从数据库历史恢复，但应用内无法撤销。',
+} as const;
 
-const catalog: Record<Locale, Record<MessageKey, string>> = { id, en };
+export type MessageKey = keyof typeof zh;
+export type Locale = 'zh-CN';
 
-export const supportedLocales: readonly Locale[] = ['id', 'en'];
-export const defaultLocale: Locale = 'id';
+const catalog: Record<Locale, Record<MessageKey, string>> = { 'zh-CN': zh };
+
+export const supportedLocales: readonly Locale[] = ['zh-CN'];
+export const defaultLocale: Locale = 'zh-CN';
 
 interface LocaleState {
   locale: Locale;
   setLocale: (locale: Locale) => void;
 }
 
-// Persisted ke localStorage (key: `arutala-locale`) supaya pilihan user persist
-// across reload. Default `id` kalau belum ada entry.
-export const useLocaleStore = create<LocaleState>()(
-  persist(
-    (set) => ({
-      locale: defaultLocale,
-      setLocale: (locale: Locale) => set({ locale }),
-    }),
-    {
-      name: 'arutala-locale',
-      storage: createJSONStorage(() => localStorage),
-    },
-  ),
-);
+// Locale is fixed to zh-CN. Store kept so `<html lang>` sync and existing
+// call sites stay typed; switching is a no-op.
+export const useLocaleStore = create<LocaleState>()((set) => ({
+  locale: defaultLocale,
+  setLocale: () => set({ locale: defaultLocale }),
+}));
 
-// Component-friendly hook. Returns `t` (lookup), `locale` (current), `setLocale` (switch).
 export const useTranslation = () => {
   const locale = useLocaleStore((s) => s.locale);
   const setLocale = useLocaleStore((s) => s.setLocale);
-
-  const t = (key: MessageKey): string => catalog[locale][key];
-
+  const t = (key: MessageKey): string => catalog[locale][key] ?? catalog[defaultLocale][key];
   return { t, locale, setLocale };
 };

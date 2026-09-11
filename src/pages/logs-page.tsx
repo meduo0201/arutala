@@ -7,6 +7,7 @@ import {
   CardContent,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { PageShell } from '@/components/layout/page-shell';
 import { LogListItem } from '@/features/daily-logs/components/log-list-item';
 import { SymptomChip } from '@/features/daily-logs/components/symptom-chip';
 import { useSymptomCatalog } from '@/features/daily-logs/hooks/use-catalogs';
@@ -53,13 +54,12 @@ const LogsPage = () => {
   const hasFilters = search.trim() || selectedSymptoms.length > 0;
 
   return (
-    <main className="min-h-dvh bg-background text-foreground">
-      <div className="max-w-md mx-auto px-4 py-6 pb-24 space-y-4">
+    <PageShell className="space-y-4">
         <header className="flex items-center gap-2">
           <Link
             to="/"
             aria-label={t('settings.back')}
-            className="inline-flex size-9 items-center justify-center rounded-md text-foreground hover:bg-muted -ml-2"
+            className="inline-flex size-11 items-center justify-center rounded-md text-foreground hover:bg-muted -ml-2"
           >
             <ChevronLeft className="size-5" />
           </Link>
@@ -136,8 +136,7 @@ const LogsPage = () => {
             )}
           </CardContent>
         </Card>
-      </div>
-    </main>
+    </PageShell>
   );
 };
 
