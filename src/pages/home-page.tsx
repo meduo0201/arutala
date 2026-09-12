@@ -1,6 +1,7 @@
 import { Heart, User as UserIcon } from 'lucide-react';
 import { PageShell } from '@/components/layout/page-shell';
 import { useAuth } from '@/features/auth/hooks/use-auth';
+import { usernameFromAuthEmail } from '@/features/auth/lib/username';
 import { useCouple } from '@/features/couples/hooks/use-couple';
 import { PeriodActionCard } from '@/features/cycles/components/period-action-card';
 import { CycleWheel } from '@/features/cycle-wheel/components/cycle-wheel';
@@ -20,7 +21,9 @@ const HomePage = () => {
   const partner = couple?.partner;
   const greeting = t(currentGreetingKey());
   const displayName =
-    profile?.display_name ?? user?.email?.split('@')[0] ?? t('home.fallback-name');
+    profile?.display_name ||
+    usernameFromAuthEmail(user?.email) ||
+    t('home.fallback-name');
   const roleKey =
     profile?.role === 'supporter'
       ? 'home.role.supporter'

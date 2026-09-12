@@ -11,6 +11,7 @@ import { PageShell } from '@/components/layout/page-shell';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useSignOut } from '@/features/auth/hooks/use-auth-mutations';
+import { usernameFromAuthEmail } from '@/features/auth/lib/username';
 import { useCouple } from '@/features/couples/hooks/use-couple';
 import { UnlinkCoupleDialog } from '@/features/couples/components/unlink-couple-dialog';
 import { DeleteAccountCard } from '@/features/account-deletion/components/delete-account-card';
@@ -53,9 +54,11 @@ const SettingsPage = () => {
         <CardContent>
           <div className="space-y-1 text-sm">
             <p className="text-muted-foreground">
-              {t('settings.account.email')}
+              {t('settings.account.username')}
             </p>
-            <p className="font-medium break-all">{user?.email}</p>
+            <p className="font-medium break-all">
+              {usernameFromAuthEmail(user?.email)}
+            </p>
           </div>
         </CardContent>
       </Card>
