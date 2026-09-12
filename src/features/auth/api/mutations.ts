@@ -29,12 +29,11 @@ export const signUpWithUsername = async (
     email: toSyntheticEmail(username),
     password: input.password,
     options: {
-      // raw_user_meta_data → handle_new_user trigger (Migration 0009) bakal
-      // pull display_name + date_of_birth ke public.profiles.
+      // raw_user_meta_data → handle_new_user trigger creates public.profiles.
+      // No personal fields (birth date / age) — display_name defaults to username.
       data: {
         display_name: username,
         username,
-        date_of_birth: input.dateOfBirth,
       },
       // Turnstile/hCaptcha token kalau captcha enabled di Supabase Auth.
       // Kalau VITE_TURNSTILE_SITE_KEY tidak di-set, captchaToken=undefined

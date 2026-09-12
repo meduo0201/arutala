@@ -49,7 +49,7 @@ export const useCancelInvitation = () => {
 
 /**
  * Unlink active couple. On success, invalidate couple query—partner display
- * disappears, CoupleRequiredRoute redirect ke /couple-setup pas user navigasi.
+ * disappears. Couple linking remains optional from Settings.
  *
  * Cycles + daily_logs di DB preserved tapi gak readable (RLS gates by active
  * couple). User bisa link lagi dengan code baru kalau mau—itu bikin couple row
