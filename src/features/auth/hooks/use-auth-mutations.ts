@@ -1,12 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { signInWithEmail, signOut, signUpWithEmail } from '@/features/auth/api/mutations';
+import {
+  signInWithUsername,
+  signOut,
+  signUpWithUsername,
+} from '@/features/auth/api/mutations';
 
 // TanStack Query mutation wrappers. Component pakai ini, BUKAN raw API.
 // Benefit: built-in pending/error state, query invalidation, devtools visibility.
 
 export const useSignIn = () => {
   return useMutation({
-    mutationFn: signInWithEmail,
+    mutationFn: signInWithUsername,
     // Auth state listener di store.ts otomatis update session—gak perlu manual
     // setSession di sini. onAuthStateChange firing dari supabase-js handles it.
   });
@@ -14,9 +18,11 @@ export const useSignIn = () => {
 
 export const useSignUp = () => {
   return useMutation({
-    mutationFn: (input: Parameters<typeof signUpWithEmail>[0] & { captchaToken?: string }) => {
+    mutationFn: (
+      input: Parameters<typeof signUpWithUsername>[0] & { captchaToken?: string },
+    ) => {
       const { captchaToken, ...rest } = input;
-      return signUpWithEmail(rest, captchaToken);
+      return signUpWithUsername(rest, captchaToken);
     },
   });
 };

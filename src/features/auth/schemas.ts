@@ -1,7 +1,20 @@
 import { z } from 'zod';
+import { isValidUsername } from '@/features/auth/lib/username';
+
+const usernameField = z
+  .string()
+  .trim()
+  .min(3, '账号至少 3 个字符。')
+  .max(32, '账号最多 32 个字符。')
+  .refine((value) => !value.includes('@'), {
+    message: '请输入英文账号，不要使用邮箱。',
+  })
+  .refine((value) => isValidUsername(value), {
+    message: '账号须以英文字母开头，只能包含字母、数字或下划线。',
+  });
 
 export const loginSchema = z.object({
-  email: z.string().email('邮箱格式不正确。'),
+  username: usernameField,
   password: z.string().min(1, '请填写密码。'),
 });
 
@@ -20,18 +33,8 @@ const yearsBetween = (start: Date, end: Date): number => {
 
 export const signupSchema = z
   .object({
-    email: z.string().email('邮箱格式不正确。'),
-    displayName: z
-      .string()
-      .min(2, '昵称至少 2 个字符。')
-      .max(40, '昵称最多 40 个字符。'),
-    password: z
-      .string()
-      .min(12, '密码至少 12 位。')
-      .regex(/[a-z]/, '密码需要包含小写字母。')
-      .regex(/[A-Z]/, '密码需要包含大写字母。')
-      .regex(/\d/, '密码需要包含数字。')
-      .regex(/[^a-zA-Z0-9]/, '密码需要包含符号（如 !@#$）。'),
+    username: usernameField,
+    password: z.string().min(6, '密码至少 6 位。'),
     confirmPassword: z.string().min(1, '请再次输入密码。'),
     dateOfBirth: z
       .string()

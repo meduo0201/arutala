@@ -22,7 +22,7 @@ export const LoginForm = () => {
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { username: '', password: '' },
   });
 
   const onSubmit = (values: LoginInput) => {
@@ -36,12 +36,21 @@ export const LoginForm = () => {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="email"
+          name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('auth.field.email')}</FormLabel>
+              <FormLabel>{t('auth.field.username')}</FormLabel>
               <FormControl>
-                <Input type="email" autoComplete="email" {...field} />
+                <Input
+                  type="text"
+                  inputMode="text"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  autoComplete="username"
+                  placeholder={t('auth.field.username.placeholder')}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

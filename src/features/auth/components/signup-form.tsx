@@ -43,8 +43,7 @@ export const SignupForm = () => {
   const form = useForm<SignupInput>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      email: '',
-      displayName: '',
+      username: '',
       password: '',
       confirmPassword: '',
       dateOfBirth: '',
@@ -98,26 +97,25 @@ export const SignupForm = () => {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="displayName"
+          name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('auth.field.display-name')}</FormLabel>
+              <FormLabel>{t('auth.field.username')}</FormLabel>
               <FormControl>
-                <Input autoComplete="nickname" {...field} />
+                <Input
+                  type="text"
+                  inputMode="text"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  autoComplete="username"
+                  placeholder={t('auth.field.username.placeholder')}
+                  {...field}
+                />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('auth.field.email')}</FormLabel>
-              <FormControl>
-                <Input type="email" autoComplete="email" {...field} />
-              </FormControl>
+              <FormDescription className="text-xs">
+                {t('auth.field.username.hint')}
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -152,9 +150,6 @@ export const SignupForm = () => {
               <FormControl>
                 <Input type="password" autoComplete="new-password" {...field} />
               </FormControl>
-              <FormDescription className="text-xs">
-                {t('auth.password.help')}
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

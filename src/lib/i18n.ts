@@ -9,14 +9,13 @@ const zh = {
   'app.smoke-test': '冒烟测试，设计令牌已加载。',
 
   // Auth — fields
-  'auth.field.email': '邮箱',
+  'auth.field.username': '账号',
+  'auth.field.username.placeholder': '英文字母，可含数字或下划线',
+  'auth.field.username.hint': '英文字母开头，可含数字或下划线。',
   'auth.field.password': '密码',
   'auth.field.password-confirm': '确认密码',
-  'auth.field.display-name': '昵称',
   'auth.field.date-of-birth': '出生日期',
   'auth.field.date-of-birth.hint': '需年满 18 岁（未成年人需监护人同意）',
-  'auth.password.help':
-    '至少 12 位，需同时包含大写字母、小写字母、数字和符号。',
   'auth.password.pwned':
     '此密码曾出现在 {count} 次公开数据泄露中，请换一个更独特的密码。',
   'auth.password.checking': '正在检查密码安全性…',
@@ -36,7 +35,7 @@ const zh = {
 
   // Auth — login
   'auth.login.title': '登录',
-  'auth.login.description': '使用邮箱和密码登录。',
+  'auth.login.description': '使用账号和密码登录。',
   'auth.login.submit': '登录',
   'auth.login.submitting': '登录中…',
   'auth.login.no-account': '还没有账号？',
@@ -48,8 +47,7 @@ const zh = {
   'auth.signup.submitting': '注册中…',
   'auth.signup.has-account': '已有账号？',
   'auth.signup.success-title': '账号已创建',
-  'auth.signup.success-body':
-    '请查收验证邮件，点击链接后再登录。',
+  'auth.signup.success-body': '请使用账号和密码登录。',
   'auth.signup.success-back-login': '返回登录',
 
   'not-found.title': '404',
@@ -418,7 +416,7 @@ const zh = {
   'privacy.controller.status-value': '个人开发者（非法人实体）',
   'privacy.controller.placeholder-name': '[数据处理者名称]',
   'privacy.data.general': '一般信息：',
-  'privacy.data.general-1': '邮箱、昵称、头像表情',
+  'privacy.data.general-1': '账号、昵称、头像表情',
   'privacy.data.general-2': '活动时间（登录、最近使用）',
   'privacy.data.sensitive': '敏感个人信息（生殖健康）：',
   'privacy.data.sensitive-1': '月经起止日期、经血量',
@@ -453,7 +451,7 @@ const zh = {
   'settings.theme.light': '浅色模式',
   'settings.language.label': '语言',
   'settings.account.title': '账号',
-  'settings.account.email': '邮箱',
+  'settings.account.username': '账号',
   'settings.couple.title': '伴侣',
   'settings.profile.title': '资料',
 
