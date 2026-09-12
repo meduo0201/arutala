@@ -1,12 +1,11 @@
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { PageShell } from '@/components/layout/page-shell';
 import { AcceptInvitationForm } from '@/features/couples/components/accept-invitation-form';
 import { InvitationCard } from '@/features/couples/components/invitation-card';
 import { useCouple } from '@/features/couples/hooks/use-couple';
 import { useTranslation } from '@/lib/i18n';
 
-// Couple linking landing page. User landing di sini setelah login kalau belum
-// punya active couple (auto-redirect dari CoupleRequiredRoute).
+// Optional couple linking. Reachable from Settings — not a required gate.
 //
 // Dua flow paralel: bikin invitation (jadi inviter) ATAU accept code (jadi joinee).
 // Setelah salah satu sukses + couple status=active, redirect ke home via:
@@ -34,6 +33,15 @@ const CoupleSetupPage = () => {
 
       <InvitationCard />
       <AcceptInvitationForm />
+
+      <p className="text-center">
+        <Link
+          to="/"
+          className="text-sm text-primary underline underline-offset-4"
+        >
+          {t('couple.setup.skip')}
+        </Link>
+      </p>
     </PageShell>
   );
 };

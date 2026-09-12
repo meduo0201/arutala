@@ -74,24 +74,38 @@ const SettingsPage = () => {
         </CardContent>
       </Card>
 
-      {partner && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">
-              {t('settings.couple.title')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm">
-              {t('couple.partner-prefix')}{' '}
-              <span className="font-medium">
-                {partner.avatar_emoji ?? '👤'} {partner.display_name}
-              </span>
-            </p>
-            <UnlinkCoupleDialog />
-          </CardContent>
-        </Card>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">
+            {t('settings.couple.title')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {partner ? (
+            <>
+              <p className="text-sm">
+                {t('couple.partner-prefix')}{' '}
+                <span className="font-medium">
+                  {partner.avatar_emoji ?? '👤'} {partner.display_name}
+                </span>
+              </p>
+              <UnlinkCoupleDialog />
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-muted-foreground">
+                {t('settings.couple.setup-body')}
+              </p>
+              <Link
+                to="/couple-setup"
+                className="inline-flex min-h-11 items-center text-sm font-medium text-primary underline underline-offset-4"
+              >
+                {t('settings.couple.setup')}
+              </Link>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardContent className="py-5">

@@ -30,7 +30,7 @@ const wrap = (node: ReactNode) => (
 // Route hierarchy:
 //   /login, /signup                            → public, no shell
 //   ProtectedRoute (auth required)
-//     /couple-setup                            → onboarding, no shell (full-screen flow)
+//     /couple-setup                            → optional couple linking, no shell
 //     AppLayout (renders BottomTabBar)
 //       /settings                              → auth-only (works pre-couple)
 //       CoupleRequiredRoute
@@ -49,7 +49,7 @@ export const router = createBrowserRouter([
   {
     element: <ProtectedRoute />,
     children: [
-      // Onboarding without shell — Phase 5 J2 added /onboarding/role flow
+      // Legacy first-run URL — now redirects home (no required onboarding)
       { path: '/onboarding/role', element: wrap(<OnboardingRolePage />) },
       { path: '/couple-setup', element: wrap(<CoupleSetupPage />) },
 

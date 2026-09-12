@@ -14,24 +14,6 @@ const zh = {
   'auth.field.username.hint': '英文字母开头，可含数字或下划线。',
   'auth.field.password': '密码',
   'auth.field.password-confirm': '确认密码',
-  'auth.field.date-of-birth': '出生日期',
-  'auth.field.date-of-birth.hint': '需年满 18 岁（未成年人需监护人同意）',
-  'auth.password.pwned':
-    '此密码曾出现在 {count} 次公开数据泄露中，请换一个更独特的密码。',
-  'auth.password.checking': '正在检查密码安全性…',
-  'auth.consent.heading': '数据处理同意',
-  'auth.consent.intro':
-    '注册前请根据《个人信息保护法》逐项确认。未勾选必选项将无法注册。',
-  'auth.consent.privacy-link': '阅读隐私说明',
-  'auth.consent.core-processing.title': '必选：健康数据处理',
-  'auth.consent.core-processing.body':
-    '我明确同意「经期记录」处理我的健康数据（经期、症状、心情、笔记），用于周期记录核心功能。数据处理者身份见隐私页。',
-  'auth.consent.cross-border.title': '必选：跨境传输',
-  'auth.consent.cross-border.body':
-    '我同意将数据传输至中国境外服务器（Supabase 东京节点与 Cloudflare 全球节点）。',
-  'auth.consent.partner-sharing.title': '可选：与伴侣共享',
-  'auth.consent.partner-sharing.body':
-    '我同意将健康数据共享给我关联的伴侣账号。可随时在设置中关闭。',
 
   // Auth — login
   'auth.login.title': '登录',
@@ -42,7 +24,7 @@ const zh = {
 
   // Auth — signup
   'auth.signup.title': '注册',
-  'auth.signup.description': '创建「经期记录」账号。',
+  'auth.signup.description': '账号和密码即可开始使用。账号名称和头像可稍后在「我的」里设置。',
   'auth.signup.submit': '注册',
   'auth.signup.submitting': '注册中…',
   'auth.signup.has-account': '已有账号？',
@@ -67,7 +49,8 @@ const zh = {
   // Couple — setup page
   'couple.setup.title': '关联伴侣账号',
   'couple.setup.description':
-    '开始记录前，可用 6 位邀请码把账号和伴侣连在一起。',
+    '可用 6 位邀请码把账号和伴侣连在一起。也可以先自己记录。',
+  'couple.setup.skip': '先去记录',
 
   // Couple — invitation create
   'couple.invite.title': '发起邀请',
@@ -241,28 +224,6 @@ const zh = {
   'home.today-log.has-notes': '+ 笔记',
   'home.today-log.button.add': '现在记录',
   'home.today-log.button.edit': '编辑记录',
-
-  // Onboarding role selection
-  'onboarding.role.title': '选择你在这里的角色',
-  'onboarding.role.subtitle': '之后可随时在设置中更改。',
-  'onboarding.role.tracker.title': '记录者',
-  'onboarding.role.tracker.body':
-    '我本人会来月经，负责记录周期、症状和心情。可以自己用，也可以和伴侣一起。',
-  'onboarding.role.supporter.title': '陪伴者',
-  'onboarding.role.supporter.body':
-    '我是伴侣，主要查看并在需要时给予支持。',
-  'onboarding.role.next': '继续',
-  'onboarding.solo.title': '你想怎么使用？',
-  'onboarding.solo.subtitle':
-    '独自使用：数据只留在自己账号。和伴侣一起：关联后可共享记录。',
-  'onboarding.solo.solo.title': '先自己用',
-  'onboarding.solo.solo.body':
-    '个人记录，不关联伴侣。以后随时可以再邀请。',
-  'onboarding.solo.couple.title': '和伴侣一起',
-  'onboarding.solo.couple.body':
-    '下一步会进入邀请码设置，方便伴侣关联。',
-  'onboarding.error': '出错了，请再试一次',
-  'onboarding.saving': '保存中…',
 
   // Home greeting
   'home.greeting.morning': '早上好',
@@ -453,11 +414,13 @@ const zh = {
   'settings.account.title': '账号',
   'settings.account.username': '账号',
   'settings.couple.title': '伴侣',
+  'settings.couple.setup': '关联伴侣账号',
+  'settings.couple.setup-body': '用邀请码和伴侣连在一起，之后可共享记录。',
   'settings.profile.title': '资料',
 
   // Profile form
-  'profile.field.display-name': '昵称',
-  'profile.field.avatar-emoji': '头像表情',
+  'profile.field.display-name': '账号名称',
+  'profile.field.avatar-emoji': '头像',
   'profile.save': '保存',
   'profile.saving': '保存中…',
   'profile.saved': '已保存 ✓',

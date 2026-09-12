@@ -5,6 +5,13 @@ this file focuses on what shipped.
 
 ## Unreleased
 
+### Auth / onboarding
+
+- Signup is username + password only. Birth date / age gate, consent checkboxes,
+  and Have I Been Pwned checks no longer block registration.
+- First-run role and couple prompts are skipped; new accounts default to solo
+  tracker. Display name and avatar remain optional in Settings.
+
 ### Performance
 
 - Initial JavaScript bundle reduced from ~467 KB gzipped to ~140 KB by

@@ -26,9 +26,9 @@ developers can study, fork, or self-host their own version.
   notification scaffolding via Web Push + VAPID.
 - **End-to-end encryption** for sensitive fields. PBKDF2 (600k iterations) +
   AES-GCM-256 via the Web Crypto API. No external crypto dependencies.
-- **Indonesian UU PDP / GDPR posture**. Explicit consent flow, consent log,
-  data export (CSV), account deletion, age gate (18+), MFA (TOTP), HIBP
-  password breach check, optional Cloudflare Turnstile captcha.
+- **Indonesian UU PDP / GDPR posture**. Consent log and privacy notice,
+  data export (CSV), account deletion, MFA (TOTP), optional Cloudflare
+  Turnstile captcha. Signup is username + password only.
 
 ## Tech stack
 
