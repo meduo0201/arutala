@@ -63,3 +63,37 @@ describe('signupSchema', () => {
     expect(result.success).toBe(false);
   });
 });
+
+describe('login and signup share username rules', () => {
+  const invalid = ['1alice', '_alice', 'ab', 'alice@x'];
+  const valid = ['alice', 'Alice_01', 'bob2'];
+
+  it.each(valid)('accepts %s on both forms', (username) => {
+    expect(loginSchema.safeParse({ username, password: 'secret' }).success).toBe(
+      true,
+    );
+    expect(
+      signupSchema.safeParse({
+        username,
+        password: 'secret1',
+        confirmPassword: 'secret1',
+      }).success,
+    ).toBe(true);
+  });
+
+  it.each(invalid)('rejects %s on both forms', (username) => {
+    const login = loginSchema.safeParse({ username, password: 'secret' });
+    const signup = signupSchema.safeParse({
+      username,
+      password: 'secret1',
+      confirmPassword: 'secret1',
+    });
+    expect(login.success).toBe(false);
+    expect(signup.success).toBe(false);
+    if (!login.success && !signup.success) {
+      expect(login.error.issues[0]?.message).toBe(
+        signup.error.issues[0]?.message,
+      );
+    }
+  });
+});

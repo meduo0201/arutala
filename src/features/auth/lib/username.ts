@@ -5,6 +5,10 @@ export const SYNTHETIC_EMAIL_DOMAIN = 'users.local';
 
 const USERNAME_PATTERN = /^[A-Za-z][A-Za-z0-9_]{2,31}$/;
 
+/** Shared login + signup copy. Do not diverge these between forms. */
+export const USERNAME_RULE_HINT = '英文字母开头，可含数字或下划线';
+export const USERNAME_INVALID_MESSAGE = `${USERNAME_RULE_HINT}。`;
+
 export const normalizeUsername = (username: string): string =>
   username.trim().toLowerCase();
 

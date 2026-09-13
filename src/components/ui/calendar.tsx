@@ -11,6 +11,7 @@ import {
   getDefaultClassNames,
   type DayButton,
 } from "react-day-picker"
+import { zhCN } from "date-fns/locale"
 
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -23,6 +24,8 @@ function Calendar({
   buttonVariant = "ghost",
   formatters,
   components,
+  labels,
+  locale,
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
   buttonVariant?: React.ComponentProps<typeof Button>["variant"]
@@ -31,6 +34,12 @@ function Calendar({
 
   return (
     <DayPicker
+      locale={locale ?? zhCN}
+      labels={{
+        labelPrevious: () => "上个月",
+        labelNext: () => "下个月",
+        ...labels,
+      }}
       showOutsideDays={showOutsideDays}
       className={cn(
         "group/calendar w-full bg-background p-1 [--cell-size:2.75rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",

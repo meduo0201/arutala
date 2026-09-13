@@ -12,3 +12,10 @@ export const RouteFallback = () => (
     </div>
   </div>
 );
+
+/** Auth pages: text-only, no salmon skeleton flash. */
+export const AuthFallback = () => (
+  <div className="min-h-dvh flex items-center justify-center bg-background">
+    <p className="text-sm text-muted-foreground">加载中…</p>
+  </div>
+);

@@ -2,8 +2,9 @@ import { lazy, Suspense, type ReactNode } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/app-layout';
 import { CoupleRequiredRoute } from '@/components/couple-required-route';
+import { OptionalAuthLayout } from '@/components/optional-auth-layout';
 import { ProtectedRoute } from '@/components/protected-route';
-import { RouteFallback } from '@/components/route-fallback';
+import { AuthFallback, RouteFallback } from '@/components/route-fallback';
 
 // Route-level code splitting (Phase 5 L1). Each page becomes its own async chunk
 // so the initial bundle only ships the layout/auth shell. The fallback is kept
@@ -25,6 +26,10 @@ const wrap = (node: ReactNode) => (
   <Suspense fallback={<RouteFallback />}>{node}</Suspense>
 );
 
+const wrapAuth = (node: ReactNode) => (
+  <Suspense fallback={<AuthFallback />}>{node}</Suspense>
+);
+
 // Phase 3+ router: 2-tier protection + AppLayout shell with bottom tab nav.
 //
 // Route hierarchy:
@@ -42,8 +47,14 @@ const wrap = (node: ReactNode) => (
 // Tab bar persists on /, /calendar, /insights, /settings, /logs.
 export const router = createBrowserRouter([
   // Public auth routes
-  { path: '/login', element: wrap(<LoginPage />) },
-  { path: '/signup', element: wrap(<SignupPage />) },
+  { path: '/login', element: wrapAuth(<LoginPage />) },
+  { path: '/signup', element: wrapAuth(<SignupPage />) },
+
+  // Privacy is readable without login; signed-in users keep the tab bar.
+  {
+    element: <OptionalAuthLayout />,
+    children: [{ path: '/privacy', element: wrap(<PrivacyPage />) }],
+  },
 
   // Authenticated
   {
@@ -58,7 +69,6 @@ export const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           { path: '/settings', element: wrap(<SettingsPage />) },
-          { path: '/privacy', element: wrap(<PrivacyPage />) },
 
           // Couple-required tabs
           {

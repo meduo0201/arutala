@@ -4,6 +4,7 @@ import {
   logConsent,
   logConsentBatch,
 } from '@/features/consent/api';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 import type { ConsentPurpose, ConsentState } from '@/features/consent/types';
 
 const CONSENT_QUERY_KEY = ['consent', 'state'] as const;
@@ -11,10 +12,12 @@ const CONSENT_QUERY_KEY = ['consent', 'state'] as const;
 // TanStack Query for consent state. staleTime 1 menit—consent rarely changes
 // dalam single session, no need re-fetch on every render.
 export const useConsentState = () => {
+  const { user } = useAuth();
   return useQuery({
     queryKey: CONSENT_QUERY_KEY,
     queryFn: getCurrentConsentState,
     staleTime: 60_000,
+    enabled: !!user,
   });
 };
 

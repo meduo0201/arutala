@@ -140,7 +140,7 @@ const LogsPage = () => {
               </div>
             ) : (
               <p className="py-6 text-center text-sm text-muted-foreground">
-                {t('logs.empty')}
+                {t(hasFilters ? 'logs.empty' : 'logs.empty-none')}
               </p>
             )}
           </CardContent>

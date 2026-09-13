@@ -10,7 +10,7 @@ const zh = {
 
   // Auth — fields
   'auth.field.username': '账号',
-  'auth.field.username.placeholder': '英文字母，可含数字或下划线',
+  'auth.field.username.placeholder': '英文字母开头，可含数字或下划线',
   'auth.field.username.hint': '英文字母开头，可含数字或下划线。',
   'auth.field.password': '密码',
   'auth.field.password-confirm': '确认密码',
@@ -31,6 +31,7 @@ const zh = {
   'auth.signup.success-title': '账号已创建',
   'auth.signup.success-body': '请使用账号和密码登录。',
   'auth.signup.success-back-login': '返回登录',
+  'auth.signup.privacy-prefix': '注册即表示你已阅读',
 
   'not-found.title': '404',
   'not-found.message': '页面不存在，链接可能输错了。',
@@ -46,8 +47,8 @@ const zh = {
   'error.crash': '页面出了点问题',
   'error.crash-body': '不用担心，数据还在。重新加载即可继续。',
   'error.reload': '重新加载',
-  'auth.error.invalid': '账号或密码不正确。',
-  'auth.error.taken': '该账号已被注册。',
+  'auth.error.invalid': '账号或密码错误',
+  'auth.error.taken': '该账号已注册',
   'calendar.a11y.day': '周期第 {day} 天，共 {total} 天，阶段：{phase}',
   'logs.flow-label': '经血量',
   'couple.invite.code-a11y': '邀请码',
@@ -132,6 +133,8 @@ const zh = {
   'calendar.day.period': '经期日',
   'calendar.day.no-period': '非经期日',
   'calendar.day.today-suffix': '（今天）',
+  'calendar.a11y.prev-month': '上个月',
+  'calendar.a11y.next-month': '下个月',
   'calendar.day.edit-cycle': '编辑这次经期',
   'calendar.day.start-here': '从这天开始记录经期',
   'calendar.day.close': '关闭',
@@ -192,6 +195,7 @@ const zh = {
   'logs.filter.clear': '清除筛选',
   'logs.results-count': '条记录',
   'logs.empty': '没有匹配的记录。',
+  'logs.empty-none': '还没有记录。',
   'logs.view-all': '查看全部记录',
 
   // Data export
@@ -285,14 +289,13 @@ const zh = {
   'push.status.not-subscribed': '未开启',
   'push.status.permission-denied': '权限被拒绝',
   'push.status.unsupported': '当前浏览器不支持',
-  'push.status.no-key': '尚未配置（管理员）',
+  'push.status.no-key': '暂未开通',
   'push.button.enable': '开启通知',
   'push.button.enabling': '开启中…',
   'push.button.disable': '关闭通知',
   'push.permission-denied.help':
     '你之前拒绝了通知。请到浏览器设置 → 网站权限 → 本站，允许通知。',
-  'push.no-key.help':
-    '环境变量中尚未配置 VAPID 公钥。参见 docs/push-setup.md。',
+  'push.no-key.help': '推送暂未开通。',
   'push.privacy-note':
     '隐私：通知内容不含敏感健康数据，只会提示「下次月经还有 N 天」。',
 
@@ -341,9 +344,8 @@ const zh = {
   'delete-account.deleting': '删除中…',
 
   // MFA / 2FA
-  'mfa.title': '两步验证（2FA）',
-  'mfa.description':
-    '使用验证器应用（如 Google Authenticator、Authy、1Password）增加一层保护。',
+  'mfa.title': '两步验证',
+  'mfa.description': '使用验证器应用增加一层保护。登录时需输入应用中的 6 位验证码。',
   'mfa.status.enrolled': '已开启',
   'mfa.status.not-enrolled': '未开启',
   'mfa.button.enroll': '开启两步验证',
@@ -387,7 +389,10 @@ const zh = {
   'privacy.controller.email-label': '邮箱',
   'privacy.controller.status-label': '身份',
   'privacy.controller.status-value': '个人开发者（非法人实体）',
-  'privacy.controller.placeholder-name': '[数据处理者名称]',
+  'privacy.controller.placeholder-name': '经期记录运营者',
+  'privacy.controller.placeholder-email': '暂未公开联系邮箱',
+  'privacy.controller.contact-label': '联系方式',
+  'privacy.controller.placeholder-contact': '请通过应用内设置联系',
   'privacy.data.general': '一般信息：',
   'privacy.data.general-1': '账号、昵称、头像表情',
   'privacy.data.general-2': '活动时间（登录、最近使用）',
@@ -404,10 +409,10 @@ const zh = {
     '因为涉及健康类敏感个人信息，处理依据是你的单独同意，而非合同履行或正当利益。',
   'privacy.retention.1': '账号有效期间持续保存',
   'privacy.retention.2': '删除账号后：软删除 30 天，再永久清除',
-  'privacy.retention.3': 'Supabase 时间点恢复备份：滚动 7 天',
+  'privacy.retention.3': '数据库时间点恢复备份：滚动 7 天',
   'privacy.retention.4': '登录日志（IP、浏览器信息）：30 天',
   'privacy.transfer.body':
-    '数据存储在中国境外：Supabase 东京（主数据库）与 Cloudflare（全球边缘、TLS）。跨境传输需你单独同意。',
+    '数据存储在中国境外的云服务商（主数据库位于东京，边缘加速覆盖全球）。跨境传输需你单独同意。',
   'privacy.rights.1': '查阅权（设置中可导出 CSV）',
   'privacy.rights.2': '更正权（可在应用内直接编辑）',
   'privacy.rights.3': '删除权（设置 → 删除账号）',

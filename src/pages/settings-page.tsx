@@ -130,19 +130,17 @@ const SettingsPage = () => {
 
       <InstallCard />
 
-      {couple && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">{t('export.title')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              {t('export.description')}
-            </p>
-            <ExportButton />
-          </CardContent>
-        </Card>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t('export.title')}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            {t('export.description')}
+          </p>
+          <ExportButton />
+        </CardContent>
+      </Card>
 
       <DeleteAccountCard />
 

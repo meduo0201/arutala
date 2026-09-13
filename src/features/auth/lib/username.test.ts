@@ -3,6 +3,8 @@ import {
   isValidUsername,
   normalizeUsername,
   toSyntheticEmail,
+  USERNAME_INVALID_MESSAGE,
+  USERNAME_RULE_HINT,
   usernameFromAuthEmail,
 } from './username';
 
@@ -27,5 +29,10 @@ describe('username mapping', () => {
 
   it('normalizes case for login/signup consistency', () => {
     expect(normalizeUsername('Alice_01')).toBe('alice_01');
+  });
+
+  it('exposes the shared username rule copy', () => {
+    expect(USERNAME_RULE_HINT).toBe('英文字母开头，可含数字或下划线');
+    expect(USERNAME_INVALID_MESSAGE).toBe('英文字母开头，可含数字或下划线。');
   });
 });
