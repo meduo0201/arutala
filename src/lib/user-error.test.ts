@@ -4,13 +4,22 @@ import { extractErrorMessage, formatUserError } from './user-error';
 describe('formatUserError', () => {
   it('maps invalid login credentials', () => {
     expect(formatUserError(new Error('Invalid login credentials'))).toBe(
-      '账号或密码不正确。',
+      '账号或密码错误',
     );
   });
 
   it('maps already registered', () => {
     expect(formatUserError({ message: 'User already registered' })).toBe(
-      '该账号已被注册。',
+      '该账号已注册',
+    );
+  });
+
+  it('maps Supabase auth error codes', () => {
+    expect(formatUserError({ code: 'invalid_credentials', message: 'x' })).toBe(
+      '账号或密码错误',
+    );
+    expect(formatUserError({ code: 'user_already_exists', message: 'x' })).toBe(
+      '该账号已注册',
     );
   });
 

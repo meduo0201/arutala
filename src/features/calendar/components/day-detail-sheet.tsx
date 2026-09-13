@@ -61,7 +61,7 @@ export const DayDetailSheet = ({
               {isPeriodDay
                 ? t('calendar.day.period')
                 : t('calendar.day.no-period')}
-              {isToday && ` · ${t('calendar.day.today-suffix')}`}
+              {isToday ? t('calendar.day.today-suffix') : ''}
             </SheetDescription>
           </SheetHeader>
 

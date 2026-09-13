@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -25,6 +26,10 @@ export const LoginForm = () => {
     resolver: zodResolver(loginSchema),
     defaultValues: { username: '', password: '' },
   });
+
+  const clearServerError = () => {
+    if (signIn.isError) signIn.reset();
+  };
 
   const onSubmit = (values: LoginInput) => {
     signIn.mutate(values, {
@@ -51,8 +56,15 @@ export const LoginForm = () => {
                   autoComplete="username"
                   placeholder={t('auth.field.username.placeholder')}
                   {...field}
+                  onChange={(event) => {
+                    field.onChange(event);
+                    clearServerError();
+                  }}
                 />
               </FormControl>
+              <FormDescription className="text-xs">
+                {t('auth.field.username.hint')}
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -64,7 +76,15 @@ export const LoginForm = () => {
             <FormItem>
               <FormLabel>{t('auth.field.password')}</FormLabel>
               <FormControl>
-                <Input type="password" autoComplete="current-password" {...field} />
+                <Input
+                  type="password"
+                  autoComplete="current-password"
+                  {...field}
+                  onChange={(event) => {
+                    field.onChange(event);
+                    clearServerError();
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -88,6 +108,14 @@ export const LoginForm = () => {
             className="text-primary underline underline-offset-4"
           >
             {t('auth.signup.title')}
+          </Link>
+        </p>
+        <p className="text-center text-xs text-muted-foreground">
+          <Link
+            to="/privacy"
+            className="text-primary underline underline-offset-4"
+          >
+            {t('privacy.title')}
           </Link>
         </p>
       </form>

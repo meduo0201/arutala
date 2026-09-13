@@ -5,6 +5,17 @@ this file focuses on what shipped.
 
 ## Unreleased
 
+### QA
+
+- Auth server errors map to Simplified Chinese toasts and inline copy
+  (`账号或密码错误` / `该账号已注册`); editing the form clears the stale error.
+- Login and signup share the same username rule: 英文字母开头，可含数字或下划线.
+- Settings push copy no longer mentions VAPID or setup docs.
+- Privacy page is readable without login, uses a Chinese contact placeholder,
+  and hides vendor names. Solo users can export CSV.
+- Calendar previous/next month labels are Chinese. Auth gate no longer flashes
+  a salmon skeleton.
+
 ### Fixes
 
 - Solo accounts now get an automatic household so period start/end and daily

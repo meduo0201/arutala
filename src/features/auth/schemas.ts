@@ -1,5 +1,8 @@
 import { z } from 'zod';
-import { isValidUsername } from '@/features/auth/lib/username';
+import {
+  isValidUsername,
+  USERNAME_INVALID_MESSAGE,
+} from '@/features/auth/lib/username';
 
 const usernameField = z
   .string()
@@ -10,7 +13,7 @@ const usernameField = z
     message: '请输入英文账号，不要使用邮箱。',
   })
   .refine((value) => isValidUsername(value), {
-    message: '账号须以英文字母开头，只能包含字母、数字或下划线。',
+    message: USERNAME_INVALID_MESSAGE,
   });
 
 export const loginSchema = z.object({

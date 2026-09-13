@@ -8,25 +8,29 @@ import {
 } from '@/components/ui/card';
 import { PageShell } from '@/components/layout/page-shell';
 import { ConsentHistoryCard } from '@/features/consent/components/consent-history-card';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useTranslation } from '@/lib/i18n';
 
 // Data-controller fields stay env-driven. Chinese placeholders when unset.
 const DATA_CONTROLLER_NAME =
   import.meta.env.VITE_DATA_CONTROLLER_NAME ?? '';
 const DATA_CONTROLLER_EMAIL =
-  import.meta.env.VITE_DATA_CONTROLLER_EMAIL ?? 'privacy@example.com';
+  import.meta.env.VITE_DATA_CONTROLLER_EMAIL ?? '';
 const PRIVACY_NOTICE_URL = import.meta.env.VITE_PRIVACY_NOTICE_URL ?? '';
 
 const PrivacyPage = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const controllerName =
     DATA_CONTROLLER_NAME.trim() || t('privacy.controller.placeholder-name');
+  const controllerEmail = DATA_CONTROLLER_EMAIL.trim();
+  const backTo = user ? '/settings' : '/login';
 
   return (
     <PageShell>
       <header className="flex items-center gap-2">
         <Link
-          to="/settings"
+          to={backTo}
           aria-label={t('settings.back')}
           className="inline-flex size-11 items-center justify-center rounded-md text-foreground hover:bg-muted -ml-2"
         >
@@ -63,14 +67,23 @@ const PrivacyPage = () => {
           </p>
           <p>
             <span className="text-muted-foreground">
-              {t('privacy.controller.email-label')}：
+              {controllerEmail
+                ? t('privacy.controller.email-label')
+                : t('privacy.controller.contact-label')}
+              ：
             </span>{' '}
-            <a
-              href={`mailto:${DATA_CONTROLLER_EMAIL}`}
-              className="font-medium text-primary underline underline-offset-4"
-            >
-              {DATA_CONTROLLER_EMAIL}
-            </a>
+            {controllerEmail ? (
+              <a
+                href={`mailto:${controllerEmail}`}
+                className="font-medium text-primary underline underline-offset-4"
+              >
+                {controllerEmail}
+              </a>
+            ) : (
+              <span className="font-medium">
+                {t('privacy.controller.placeholder-contact')}
+              </span>
+            )}
           </p>
           <p>
             <span className="text-muted-foreground">
@@ -192,7 +205,7 @@ const PrivacyPage = () => {
         </a>
       ) : null}
 
-      <ConsentHistoryCard />
+      {user ? <ConsentHistoryCard /> : null}
     </PageShell>
   );
 };

@@ -34,6 +34,10 @@ export const SignupForm = () => {
     },
   });
 
+  const clearServerError = () => {
+    if (signUp.isError) signUp.reset();
+  };
+
   if (signUp.isSuccess) {
     return (
       <div className="space-y-3 text-center">
@@ -75,6 +79,10 @@ export const SignupForm = () => {
                   autoComplete="username"
                   placeholder={t('auth.field.username.placeholder')}
                   {...field}
+                  onChange={(event) => {
+                    field.onChange(event);
+                    clearServerError();
+                  }}
                 />
               </FormControl>
               <FormDescription className="text-xs">
@@ -91,7 +99,15 @@ export const SignupForm = () => {
             <FormItem>
               <FormLabel>{t('auth.field.password')}</FormLabel>
               <FormControl>
-                <Input type="password" autoComplete="new-password" {...field} />
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  {...field}
+                  onChange={(event) => {
+                    field.onChange(event);
+                    clearServerError();
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -104,7 +120,15 @@ export const SignupForm = () => {
             <FormItem>
               <FormLabel>{t('auth.field.password-confirm')}</FormLabel>
               <FormControl>
-                <Input type="password" autoComplete="new-password" {...field} />
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  {...field}
+                  onChange={(event) => {
+                    field.onChange(event);
+                    clearServerError();
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -137,6 +161,15 @@ export const SignupForm = () => {
             className="text-primary underline underline-offset-4"
           >
             {t('auth.login.title')}
+          </Link>
+        </p>
+        <p className="text-center text-xs text-muted-foreground">
+          {t('auth.signup.privacy-prefix')}{' '}
+          <Link
+            to="/privacy"
+            className="text-primary underline underline-offset-4"
+          >
+            {t('privacy.title')}
           </Link>
         </p>
       </form>
