@@ -65,7 +65,7 @@ const ensureTurnstileScript = (): Promise<void> => {
       scriptLoaded = true;
       resolve();
     };
-    script.onerror = () => reject(new Error('Failed to load Turnstile'));
+    script.onerror = () => reject(new Error('验证组件加载失败，请刷新后重试。'));
     document.head.appendChild(script);
   });
   return scriptPromise;

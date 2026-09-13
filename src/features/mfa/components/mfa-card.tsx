@@ -100,7 +100,7 @@ export const MfaCard = () => {
             <div className="flex justify-center">
               <img
                 src={qrDataUrl}
-                alt="TOTP QR Code"
+                alt="两步验证二维码"
                 width={220}
                 height={220}
                 className="rounded-md bg-white p-2"

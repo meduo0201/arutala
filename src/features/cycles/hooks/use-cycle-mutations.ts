@@ -40,7 +40,7 @@ export const useStartPeriod = () => {
   return useMutation({
     mutationFn: (params: { start_date: string; notes?: string | undefined }) => {
       if (!user || !couple) {
-        throw new Error('useStartPeriod requires authenticated user + active couple');
+        throw new Error('还不能记录，请刷新页面后再试。');
       }
       return startCycle({
         couple_id: couple.id,

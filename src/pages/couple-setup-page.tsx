@@ -15,8 +15,9 @@ const CoupleSetupPage = () => {
   const { t } = useTranslation();
   const couple = useCouple();
 
-  // Already linked → redirect home (no point showing setup).
-  if (couple.data) {
+  // Already linked with a partner → redirect home.
+  // Solo household (no partner) can still generate / accept an invite.
+  if (couple.data?.partner) {
     return <Navigate to="/" replace />;
   }
 

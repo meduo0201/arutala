@@ -104,12 +104,20 @@ export const acceptInvitation = async (code: string): Promise<string> => {
 export const getCurrentCouple = async (
   userId: string,
 ): Promise<CoupleWithPartner | null> => {
-  const { data: coupleId, error: rpcError } = await supabase.rpc(
-    'current_couple_id',
-  );
-  if (rpcError) {
-    console.error('[couples] current_couple_id RPC error:', rpcError);
-    throw rpcError;
+  // Prefer ensure_solo_household so solo users can log cycles immediately.
+  // Fall back to current_couple_id if migration 0024 is not applied yet.
+  let coupleId: string | null = null;
+  const ensured = await supabase.rpc('ensure_solo_household');
+  if (ensured.error) {
+    console.warn('[couples] ensure_solo_household unavailable, falling back:', ensured.error.message);
+    const fallback = await supabase.rpc('current_couple_id');
+    if (fallback.error) {
+      console.error('[couples] current_couple_id RPC error:', fallback.error);
+      throw ensured.error;
+    }
+    coupleId = (fallback.data as string | null) ?? null;
+  } else {
+    coupleId = (ensured.data as string | null) ?? null;
   }
   if (!coupleId) return null;
 

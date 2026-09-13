@@ -4,6 +4,7 @@ import { RouterProvider } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'sonner';
+import { AppErrorBoundary } from '@/components/error-boundary';
 import { router } from '@/router';
 import { queryClient } from '@/lib/query-client';
 import { useLocaleStore } from '@/lib/i18n';
@@ -12,7 +13,10 @@ import { initializeAuth } from '@/features/auth/store';
 import '@/globals.css';
 
 const root = document.getElementById('root');
-if (!root) throw new Error('Root element #root not found in index.html');
+if (!root) {
+  document.body.textContent = '页面无法启动，请刷新后重试。';
+  throw new Error('Root element #root not found in index.html');
+}
 
 // Sync <html lang> dengan current locale (initial mount + subsequent changes).
 // Pakai vanilla store subscribe (bukan React hook) supaya gak butuh layout component.
@@ -31,19 +35,20 @@ initializeAuth();
 
 createRoot(root).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      <Toaster
-        position="top-center"
-        richColors
-        closeButton
-        theme="system"
-        toastOptions={{
-          // Match brand: rounded + small text + don't auto-dismiss too fast
-          duration: 3000,
-        }}
-      />
-      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
-    </QueryClientProvider>
+    <AppErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+        <Toaster
+          position="top-center"
+          richColors
+          closeButton
+          theme="system"
+          toastOptions={{
+            duration: 3000,
+          }}
+        />
+        {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+      </QueryClientProvider>
+    </AppErrorBoundary>
   </StrictMode>,
 );

@@ -115,4 +115,4 @@ const CATALOG_ZH: Record<string, string> = {
 export const getCatalogLabel = (
   row: { key: string; label_id: string; label_en: string },
   _locale?: Locale,
-): string => CATALOG_ZH[row.key] ?? row.label_en ?? row.label_id;
+): string => CATALOG_ZH[row.key] ?? '其他';

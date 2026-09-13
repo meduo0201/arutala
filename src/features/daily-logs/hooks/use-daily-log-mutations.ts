@@ -49,7 +49,7 @@ export const useUpsertDailyLog = () => {
       },
     ) => {
       if (!user || !couple) {
-        throw new Error('useUpsertDailyLog requires authenticated user + active couple');
+        throw new Error('还不能记录，请刷新页面后再试。');
       }
       return upsertDailyLog({
         couple_id: couple.id,

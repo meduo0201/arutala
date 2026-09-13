@@ -20,7 +20,7 @@ export const useCycles = () => {
   return useQuery({
     queryKey: cyclesQueryKey(coupleId),
     queryFn: () => {
-      if (!coupleId) throw new Error('useCycles called without active couple');
+      if (!coupleId) throw new Error('还不能记录，请刷新页面后再试。');
       return listCycles(coupleId);
     },
     enabled: !!coupleId,
@@ -38,7 +38,7 @@ export const useActiveCycle = () => {
   return useQuery({
     queryKey: activeCycleQueryKey(coupleId),
     queryFn: () => {
-      if (!coupleId) throw new Error('useActiveCycle called without active couple');
+      if (!coupleId) throw new Error('还不能记录，请刷新页面后再试。');
       return getActiveCycle(coupleId);
     },
     enabled: !!coupleId,

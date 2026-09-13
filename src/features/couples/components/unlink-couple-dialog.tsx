@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useUnlinkCouple } from '@/features/couples/hooks/use-couple-mutations';
 import { useTranslation } from '@/lib/i18n';
+import { formatUserError } from '@/lib/user-error';
 
 // Destructive action with explicit confirmation. Pasca-unlink, user redirect
 // ke /couple-setup via CoupleRequiredRoute (next nav).
@@ -40,7 +41,7 @@ export const UnlinkCoupleDialog = () => {
         </AlertDialogHeader>
         {unlink.error && (
           <p className="text-sm text-destructive" role="alert">
-            {unlink.error.message}
+            {formatUserError(unlink.error, t('toast.error.generic'))}
           </p>
         )}
         <AlertDialogFooter>

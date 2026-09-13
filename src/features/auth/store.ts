@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { Session, User } from '@supabase/supabase-js';
 import { replayPendingConsentIfAny } from '@/features/consent/pending';
-import { supabase } from '@/lib/supabase';
+import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 
 // Session source-of-truth pakai Zustand vanilla store. Kenapa Zustand bukan
 // React Context: gak perlu wrap component tree, bisa di-access dari non-component
@@ -36,16 +36,24 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
  * (jarang, biasanya selamanya app lifetime).
  */
 export const initializeAuth = () => {
-  void supabase.auth.getSession().then(({ data }) => {
-    useAuthStore.getState().setSession(data.session);
-  });
+  if (!isSupabaseConfigured) {
+    useAuthStore.getState().setSession(null);
+    return () => undefined;
+  }
+
+  void supabase.auth
+    .getSession()
+    .then(({ data }) => {
+      useAuthStore.getState().setSession(data.session);
+    })
+    .catch(() => {
+      useAuthStore.getState().setSession(null);
+    });
 
   const {
     data: { subscription },
   } = supabase.auth.onAuthStateChange((_event, session) => {
     useAuthStore.getState().setSession(session);
-    // Replay pending consent (saved during signup) once user is authenticated.
-    // Idempotent-ish: pending cleared after success; failed replay retries next event.
     if (session?.user) {
       void replayPendingConsentIfAny();
     }

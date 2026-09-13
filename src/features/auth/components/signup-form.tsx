@@ -17,6 +17,7 @@ import { signupSchema, type SignupInput } from '@/features/auth/schemas';
 import { useSignUp } from '@/features/auth/hooks/use-auth-mutations';
 import { TurnstileWidget } from '@/features/captcha/turnstile-widget';
 import { useTranslation } from '@/lib/i18n';
+import { formatUserError } from '@/lib/user-error';
 
 export const SignupForm = () => {
   const { t } = useTranslation();
@@ -117,7 +118,7 @@ export const SignupForm = () => {
 
         {signUp.error && (
           <p className="text-sm text-destructive" role="alert">
-            {signUp.error.message}
+            {formatUserError(signUp.error, t('toast.error.generic'))}
           </p>
         )}
 

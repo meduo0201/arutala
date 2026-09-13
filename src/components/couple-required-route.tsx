@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom';
+import { QueryError } from '@/components/query-error';
 import { useCouple } from '@/features/couples/hooks/use-couple';
 import { useCoupleRealtime } from '@/features/couples/hooks/use-couple-realtime';
 import { useProfile } from '@/features/profile/hooks/use-profile';
@@ -20,6 +21,20 @@ export const CoupleRequiredRoute = () => {
     return (
       <div className="min-h-dvh flex items-center justify-center">
         <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
+      </div>
+    );
+  }
+
+  if (couple.isError || profile.isError) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center px-6">
+        <QueryError
+          error={couple.error ?? profile.error}
+          onRetry={() => {
+            void couple.refetch();
+            void profile.refetch();
+          }}
+        />
       </div>
     );
   }

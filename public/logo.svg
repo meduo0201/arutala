@@ -1,15 +1,11 @@
 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Arutala brand mark — abstract crescent + dot motif representing
-       lunar cycle (haid + bulan, the project name "Arutala" inspired by
-       Indonesian lunar concept). Soft rose-to-luteal gradient per DESIGN.md. -->
   <defs>
     <linearGradient id="arutala-grad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#E8829F"/>
-      <stop offset="0.55" stop-color="#C99CC4"/>
-      <stop offset="1" stop-color="#9F8AC4"/>
+      <stop offset="0.55" stop-color="#F0A3A0"/>
+      <stop offset="1" stop-color="#F2C4B0"/>
     </linearGradient>
   </defs>
-  <!-- Crescent ring (open arc shaped like uterine + moon hybrid) -->
   <path
     d="M32 8
        A24 24 0 1 1 18 51.5
@@ -17,6 +13,5 @@
        Z"
     fill="url(#arutala-grad)"
   />
-  <!-- Center dot — represents ovulation / focal point -->
   <circle cx="44" cy="32" r="4" fill="url(#arutala-grad)"/>
 </svg>

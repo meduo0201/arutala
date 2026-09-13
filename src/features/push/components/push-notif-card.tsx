@@ -13,6 +13,7 @@ import {
   type PushSubscriptionState,
 } from '@/features/push/hooks/use-push';
 import { useTranslation, type MessageKey } from '@/lib/i18n';
+import { formatUserError } from '@/lib/user-error';
 
 const STATUS_LABEL: Record<Exclude<PushSubscriptionState, 'unknown'>, MessageKey> = {
   subscribed: 'push.status.subscribed',
@@ -97,6 +98,15 @@ export const PushNotifCard = () => {
               ? t('push.button.enabling')
               : t('push.button.enable')}
           </Button>
+        )}
+
+        {(subscribe.error || unsubscribe.error) && (
+          <p className="text-sm text-destructive" role="alert">
+            {formatUserError(
+              subscribe.error || unsubscribe.error,
+              t('toast.error.generic'),
+            )}
+          </p>
         )}
 
         {state === 'permission-denied' && (

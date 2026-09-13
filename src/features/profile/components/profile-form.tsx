@@ -17,6 +17,7 @@ import {
   type UpdateProfileInput,
 } from '@/features/profile/schemas';
 import { useTranslation } from '@/lib/i18n';
+import { formatUserError } from '@/lib/user-error';
 
 // Profile edit form: display_name + avatar_emoji.
 // Loaded async, re-init form pas data masuk supaya defaultValues sync.
@@ -90,7 +91,7 @@ export const ProfileForm = () => {
 
         {update.error && (
           <p className="text-sm text-destructive" role="alert">
-            {update.error.message}
+            {formatUserError(update.error, t('toast.error.generic'))}
           </p>
         )}
         {update.isSuccess && !update.isPending && (
