@@ -14,6 +14,7 @@ import {
 } from '@/features/couples/hooks/use-couple-mutations';
 import { useMyInvitation } from '@/features/couples/hooks/use-couple';
 import { useTranslation } from '@/lib/i18n';
+import { formatUserError } from '@/lib/user-error';
 
 // Card UI untuk generate invitation code. Source of truth = DB query
 // (`useMyInvitation`)—reload halaman tetep nge-show code yang udah di-generate.
@@ -72,7 +73,7 @@ export const InvitationCard = () => {
             <div className="flex items-center gap-3">
               <code
                 className="flex-1 font-mono text-2xl font-semibold tracking-[0.3em] text-center py-3 bg-muted rounded-md"
-                aria-label="invitation code"
+                aria-label={t('couple.invite.code-a11y')}
               >
                 {code}
               </code>
@@ -113,7 +114,7 @@ export const InvitationCard = () => {
 
         {error && (
           <p className="text-sm text-destructive" role="alert">
-            {error.message}
+            {formatUserError(error, t('toast.error.generic'))}
           </p>
         )}
       </CardContent>

@@ -28,6 +28,7 @@ import {
 import { useE2eeStore } from '@/features/e2ee/store';
 import { encrypt } from '@/lib/crypto';
 import { useTranslation } from '@/lib/i18n';
+import { formatUserError } from '@/lib/user-error';
 
 interface DailyLogFormProps {
   /** YYYY-MM-DD */
@@ -240,7 +241,7 @@ export const DailyLogForm = ({ logDate, cycleId, onSaved }: DailyLogFormProps) =
 
       {apiError && (
         <p className="text-sm text-destructive" role="alert">
-          {apiError.message}
+          {formatUserError(apiError, t('toast.error.generic'))}
         </p>
       )}
 

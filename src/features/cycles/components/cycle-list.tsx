@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { EditCycleDialog } from '@/features/cycles/components/edit-cycle-dialog';
 import { useCycles } from '@/features/cycles/hooks/use-cycles';
 import { periodDays, type CycleRow } from '@/features/cycles/types';
+import { QueryError } from '@/components/query-error';
 import { formatDate } from '@/lib/format-date';
 import { useTranslation } from '@/lib/i18n';
 
@@ -19,6 +20,10 @@ export const CycleList = () => {
   const { t, locale } = useTranslation();
   const cycles = useCycles();
   const [editingCycle, setEditingCycle] = useState<CycleRow | null>(null);
+
+  if (cycles.isError) {
+    return <QueryError error={cycles.error} onRetry={() => void cycles.refetch()} />;
+  }
 
   if (cycles.isLoading) {
     return (

@@ -22,6 +22,7 @@ import {
   saltToBase64,
 } from '@/lib/crypto';
 import { useTranslation } from '@/lib/i18n';
+import { formatUserError } from '@/lib/user-error';
 
 interface PassphraseSetupDialogProps {
   open: boolean;
@@ -87,7 +88,7 @@ export const PassphraseSetupDialog = ({
       onOpenChange(false);
       onSuccess?.();
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(formatUserError(e, t('toast.error.generic')));
     } finally {
       setBusy(false);
     }

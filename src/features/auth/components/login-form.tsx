@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { loginSchema, type LoginInput } from '@/features/auth/schemas';
 import { useSignIn } from '@/features/auth/hooks/use-auth-mutations';
 import { useTranslation } from '@/lib/i18n';
+import { formatUserError } from '@/lib/user-error';
 
 export const LoginForm = () => {
   const { t } = useTranslation();
@@ -72,7 +73,7 @@ export const LoginForm = () => {
 
         {signIn.error && (
           <p className="text-sm text-destructive" role="alert">
-            {signIn.error.message}
+            {formatUserError(signIn.error, t('auth.error.invalid'))}
           </p>
         )}
 

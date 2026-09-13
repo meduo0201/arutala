@@ -35,7 +35,7 @@ const subscriptionToServerShape = (
   const p256dhKey = sub.getKey('p256dh');
   const authKey = sub.getKey('auth');
   if (!p256dhKey || !authKey) {
-    throw new Error('Subscription missing p256dh / auth keys');
+    throw new Error('推送订阅不完整，请重试。');
   }
   return {
     endpoint: sub.endpoint,
@@ -54,10 +54,10 @@ export const subscribePush = async (
   label?: string,
 ): Promise<{ id: string; endpoint: string }> => {
   if (!('serviceWorker' in navigator)) {
-    throw new Error('Service Worker tidak tersedia di browser ini');
+    throw new Error('当前浏览器不支持此功能。');
   }
   if (!('PushManager' in window)) {
-    throw new Error('Push Notifications tidak tersedia di browser ini');
+    throw new Error('当前浏览器不支持此功能。');
   }
 
   const registration = await navigator.serviceWorker.ready;

@@ -77,12 +77,11 @@ export const usePushSubscribe = (vapidPublicKey: string | undefined) => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (label?: string) => {
-      if (!vapidPublicKey) throw new Error('VAPID key not configured');
-      // Browser permission prompt
+      if (!vapidPublicKey) throw new Error('尚未配置推送公钥。');
       if ('Notification' in window) {
         const result = await Notification.requestPermission();
         if (result !== 'granted') {
-          throw new Error('Notification permission denied');
+          throw new Error('通知权限被拒绝。');
         }
       }
       return subscribePush(vapidPublicKey, label);

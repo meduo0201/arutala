@@ -9,12 +9,11 @@ interface ThemeState {
   toggle: () => void;
 }
 
-// Persisted via localStorage. Default `dark` per DESIGN.md (cycle tracker
-// users prefer dark for night use + eye strain reduction).
+// Persisted via localStorage. Default light — warm blush period-tracker look.
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set, get) => ({
-      theme: 'dark',
+      theme: 'light',
       setTheme: (theme) => set({ theme }),
       toggle: () => set({ theme: get().theme === 'dark' ? 'light' : 'dark' }),
     }),

@@ -30,6 +30,7 @@ import {
 import type { CycleRow } from '@/features/cycles/types';
 import { todayIso } from '@/lib/format-date';
 import { useTranslation } from '@/lib/i18n';
+import { formatUserError } from '@/lib/user-error';
 
 // Combined dialog buat dua mode:
 // - Add (no `cycle` prop): create new cycle dengan custom dates (backdate flow)
@@ -204,7 +205,7 @@ export const EditCycleDialog = ({
 
             {apiError && (
               <p className="text-sm text-destructive" role="alert">
-                {apiError.message}
+                {formatUserError(apiError, t('toast.error.generic'))}
               </p>
             )}
 

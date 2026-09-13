@@ -14,8 +14,10 @@ import {
   useEndPeriod,
   useStartPeriod,
 } from '@/features/cycles/hooks/use-cycle-mutations';
+import { QueryError } from '@/components/query-error';
 import { daysBetween, formatDate, todayIso } from '@/lib/format-date';
 import { useTranslation } from '@/lib/i18n';
+import { formatUserError } from '@/lib/user-error';
 
 // Big one-tap card—primary interaction Phase 1.
 // - Idle (no active cycle): "Period Mulai Hari Ini" + small "atau backdate" link
@@ -28,6 +30,10 @@ export const PeriodActionCard = () => {
   const startPeriod = useStartPeriod();
   const endPeriod = useEndPeriod();
   const [backdateOpen, setBackdateOpen] = useState(false);
+
+  if (activeCycle.isError) {
+    return <QueryError error={activeCycle.error} onRetry={() => void activeCycle.refetch()} />;
+  }
 
   if (activeCycle.isLoading) {
     return (
@@ -81,7 +87,7 @@ export const PeriodActionCard = () => {
           </Button>
           {endPeriod.error && (
             <p className="text-sm text-destructive" role="alert">
-              {endPeriod.error.message}
+              {formatUserError(endPeriod.error, t('toast.error.generic'))}
             </p>
           )}
         </CardContent>
@@ -111,7 +117,7 @@ export const PeriodActionCard = () => {
           </Button>
           {startPeriod.error && (
             <p className="text-sm text-destructive" role="alert">
-              {startPeriod.error.message}
+              {formatUserError(startPeriod.error, t('toast.error.generic'))}
             </p>
           )}
           <button

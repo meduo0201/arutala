@@ -256,9 +256,21 @@ export interface Database {
         Args: Record<PropertyKey, never>;
         Returns: string;
       };
+      ensure_solo_household: {
+        Args: Record<PropertyKey, never>;
+        Returns: string;
+      };
       generate_invitation_code: {
         Args: Record<PropertyKey, never>;
         Returns: string;
+      };
+      unlink_couple: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
+      cancel_invitation: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
       };
     };
     Enums: Record<string, never>;

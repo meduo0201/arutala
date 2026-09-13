@@ -5,6 +5,21 @@ this file focuses on what shipped.
 
 ## Unreleased
 
+### Fixes
+
+- Solo accounts now get an automatic household so period start/end and daily
+  logs work without linking a partner. Invitation / unlink keep that data.
+- Auth bootstrap no longer hangs if `getSession()` fails. Supabase client
+  accepts `sb_publishable_...` keys. Render errors show a Chinese recovery
+  screen instead of a blank page.
+- API and auth failures display Simplified Chinese instead of English or
+  leftover Indonesian RPC text.
+
+### Style
+
+- Light default theme with a warm blush / rose palette. Dark mode is cocoa-rose
+  rather than icy purple. PWA theme color and logo gradient match.
+
 ### Auth / onboarding
 
 - Signup is username + password only. Birth date / age gate, consent checkboxes,

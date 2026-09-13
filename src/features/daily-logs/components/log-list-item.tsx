@@ -17,7 +17,7 @@ const FLOW_DOTS: Record<number, number> = { 0: 0, 1: 1, 2: 2, 3: 3, 4: 4 };
 // Compact log row buat /logs page list. Date prominently, flow indicator,
 // up to 3 symptom emoji + count for rest, notes truncated.
 export const LogListItem = ({ log }: LogListItemProps) => {
-  const { locale } = useTranslation();
+  const { t, locale } = useTranslation();
   const symptoms = useSymptomCatalog();
 
   const matchedSymptoms =
@@ -32,7 +32,7 @@ export const LogListItem = ({ log }: LogListItemProps) => {
           {formatDate(log.log_date, locale)}
         </span>
         {log.flow_intensity !== null && log.flow_intensity > 0 && (
-          <span className="flex items-center gap-1" aria-label={`Flow ${log.flow_intensity}`}>
+          <span className="flex items-center gap-1" aria-label={`${t('logs.flow-label')} ${log.flow_intensity}`}>
             <Droplet
               className={cn(
                 'size-3.5',

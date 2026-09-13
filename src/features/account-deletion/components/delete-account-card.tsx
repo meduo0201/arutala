@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input';
 import { deleteAccount } from '@/features/account-deletion/api';
 import { signOut as signOutApi } from '@/features/auth/api/mutations';
 import { useTranslation } from '@/lib/i18n';
+import { formatUserError } from '@/lib/user-error';
 
 // Self-service delete account dengan type-to-confirm safeguard.
 // Flow: button → dialog → type keyword → mutation → signOut global → redirect.
@@ -106,7 +107,7 @@ export const DeleteAccountCard = () => {
             </div>
             {mutation.error && (
               <p className="text-sm text-destructive" role="alert">
-                {mutation.error.message}
+                {formatUserError(mutation.error, t('toast.error.generic'))}
               </p>
             )}
             <AlertDialogFooter>

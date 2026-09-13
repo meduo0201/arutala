@@ -26,7 +26,7 @@ export const saveEncryptionMeta = async (
 ): Promise<void> => {
   const { data: userResult } = await supabase.auth.getUser();
   const userId = userResult.user?.id;
-  if (!userId) throw new Error('Not authenticated');
+  if (!userId) throw new Error('请先登录。');
 
   const { error } = await supabase
     .from('profiles')
@@ -47,7 +47,7 @@ export const updateEncryptionVerifier = async (
 ): Promise<void> => {
   const { data: userResult } = await supabase.auth.getUser();
   const userId = userResult.user?.id;
-  if (!userId) throw new Error('Not authenticated');
+  if (!userId) throw new Error('请先登录。');
 
   const { error } = await supabase
     .from('profiles')
@@ -63,7 +63,7 @@ export const updateEncryptionVerifier = async (
 export const disableE2ee = async (): Promise<void> => {
   const { data: userResult } = await supabase.auth.getUser();
   const userId = userResult.user?.id;
-  if (!userId) throw new Error('Not authenticated');
+  if (!userId) throw new Error('请先登录。');
 
   // Clear profile encryption fields
   const { error: profileErr } = await supabase

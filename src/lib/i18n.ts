@@ -39,6 +39,18 @@ const zh = {
   // Common
   'common.loading': '加载中…',
   'common.close': '关闭',
+  'common.retry': '重试',
+  'error.load-failed': '加载失败，请检查网络后重试。',
+  'error.config': '应用还没有配置完成，暂时无法连接。',
+  'error.household': '还不能开始记录，请刷新页面后再试。',
+  'error.crash': '页面出了点问题',
+  'error.crash-body': '不用担心，数据还在。重新加载即可继续。',
+  'error.reload': '重新加载',
+  'auth.error.invalid': '账号或密码不正确。',
+  'auth.error.taken': '该账号已被注册。',
+  'calendar.a11y.day': '周期第 {day} 天，共 {total} 天，阶段：{phase}',
+  'logs.flow-label': '经血量',
+  'couple.invite.code-a11y': '邀请码',
 
   // Home (protected)
   'home.signed-in-as': '当前登录',

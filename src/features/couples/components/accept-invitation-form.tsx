@@ -23,6 +23,7 @@ import {
 } from '@/features/couples/schemas';
 import { useAcceptInvitation } from '@/features/couples/hooks/use-couple-mutations';
 import { useTranslation } from '@/lib/i18n';
+import { formatUserError } from '@/lib/user-error';
 
 // Form untuk accept invitation code. Input auto-uppercase via onChange transform
 // supaya user lihat letter case yang benar saat ngetik (zod transform jalan
@@ -75,7 +76,7 @@ export const AcceptInvitationForm = () => {
 
             {acceptInvitation.error && (
               <p className="text-sm text-destructive" role="alert">
-                {acceptInvitation.error.message}
+                {formatUserError(acceptInvitation.error, t('toast.error.generic'))}
               </p>
             )}
 

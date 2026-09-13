@@ -8,6 +8,7 @@ import {
 import { PageShell } from '@/components/layout/page-shell';
 import { LoginForm } from '@/features/auth/components/login-form';
 import { useTranslation } from '@/lib/i18n';
+import { isSupabaseConfigured } from '@/lib/supabase';
 
 const LoginPage = () => {
   const { t } = useTranslation();
@@ -27,7 +28,13 @@ const LoginPage = () => {
           <CardDescription>{t('auth.login.description')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <LoginForm />
+          {isSupabaseConfigured ? (
+            <LoginForm />
+          ) : (
+            <p className="text-sm text-destructive" role="alert">
+              {t('error.config')}
+            </p>
+          )}
         </CardContent>
       </Card>
     </PageShell>

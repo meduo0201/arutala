@@ -12,6 +12,7 @@ import { LogListItem } from '@/features/daily-logs/components/log-list-item';
 import { SymptomChip } from '@/features/daily-logs/components/symptom-chip';
 import { useSymptomCatalog } from '@/features/daily-logs/hooks/use-catalogs';
 import { useDailyLogs } from '@/features/daily-logs/hooks/use-daily-logs';
+import { QueryError } from '@/components/query-error';
 import { useTranslation } from '@/lib/i18n';
 
 // Full daily log list dengan search + symptom filter. Search by notes text
@@ -117,13 +118,21 @@ const LogsPage = () => {
         )}
 
         {/* Results */}
+        {logs.isError ? (
+          <QueryError error={logs.error} onRetry={() => void logs.refetch()} />
+        ) : (
+          <>
         <p className="text-xs text-muted-foreground">
           {filtered.length} {t('logs.results-count')}
         </p>
 
         <Card>
           <CardContent className="py-2">
-            {filtered.length > 0 ? (
+            {logs.isLoading ? (
+              <p className="py-6 text-center text-sm text-muted-foreground">
+                {t('common.loading')}
+              </p>
+            ) : filtered.length > 0 ? (
               <div>
                 {filtered.map((log) => (
                   <LogListItem key={log.id} log={log} />
@@ -136,6 +145,8 @@ const LogsPage = () => {
             )}
           </CardContent>
         </Card>
+          </>
+        )}
     </PageShell>
   );
 };

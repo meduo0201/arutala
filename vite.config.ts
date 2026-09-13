@@ -27,8 +27,8 @@ export default defineConfig({
         short_name: '经期记录',
         description:
           '面向个人与伴侣的经期与周期记录，隐私优先。',
-        theme_color: '#1a0d2e',
-        background_color: '#1a0d2e',
+        theme_color: '#F8E4E8',
+        background_color: '#FDF6F7',
         display: 'standalone',
         orientation: 'portrait',
         scope: '/',

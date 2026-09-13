@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { DayDetailSheet } from '@/features/calendar/components/day-detail-sheet';
 import { useCycles } from '@/features/cycles/hooks/use-cycles';
 import { useDailyLogByDate } from '@/features/daily-logs/hooks/use-daily-logs';
+import { QueryError } from '@/components/query-error';
 import { todayIso } from '@/lib/format-date';
 import { useTranslation } from '@/lib/i18n';
 
@@ -34,6 +35,10 @@ export const TodayLogCard = () => {
   // ISO berubah (lewat tengah malam saat tab tetap terbuka — ke-handle by
   // re-render via React Query refetch atau manual reload).
   const todayDate = useMemo(() => new Date(today + 'T00:00:00'), [today]);
+
+  if (log.isError) {
+    return <QueryError error={log.error} onRetry={() => void log.refetch()} />;
+  }
 
   if (log.isLoading) {
     return (

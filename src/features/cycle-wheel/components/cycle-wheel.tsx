@@ -10,6 +10,7 @@ import {
   polarToCartesian,
   type CyclePhase,
 } from '@/features/cycle-wheel/lib/wheel-math';
+import { QueryError } from '@/components/query-error';
 import { todayIso } from '@/lib/format-date';
 import { useTranslation } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
@@ -48,6 +49,10 @@ export const CycleWheel = () => {
   const cycles = useCycles();
   const { prediction } = usePrediction();
   const reduced = useReducedMotion();
+
+  if (cycles.isError) {
+    return <QueryError error={cycles.error} onRetry={() => void cycles.refetch()} />;
+  }
 
   if (cycles.isLoading) {
     return (
@@ -149,7 +154,10 @@ export const CycleWheel = () => {
             viewBox={`0 0 ${SIZE} ${SIZE}`}
             className="w-full max-w-[280px] aspect-square"
             role="img"
-            aria-label={`Cycle day ${currentDay} of ${cycleLength}, phase ${phase}`}
+            aria-label={t('calendar.a11y.day')
+              .replace('{day}', String(currentDay))
+              .replace('{total}', String(cycleLength))
+              .replace('{phase}', t(PHASE_KEYS[phase]))}
           >
             {/* Phase arcs — stroke-dasharray reveal animation. Each arc draws
                 from start to end via animating pathLength from 0 to 1. */}

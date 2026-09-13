@@ -3,7 +3,7 @@ import { z } from 'zod';
 // ISO date YYYY-MM-DD. Forms pakai HTML <input type="date"> yang return format ini.
 const isoDate = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, '日期格式须为 YYYY-MM-DD。');
+  .regex(/^\d{4}-\d{2}-\d{2}$/, '请选择有效日期。');
 
 export const startCycleSchema = z.object({
   start_date: isoDate,

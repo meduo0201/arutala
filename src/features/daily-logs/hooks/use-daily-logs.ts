@@ -20,7 +20,7 @@ export const useDailyLogs = () => {
   return useQuery({
     queryKey: dailyLogsListKey(coupleId),
     queryFn: () => {
-      if (!coupleId) throw new Error('useDailyLogs called without active couple');
+      if (!coupleId) throw new Error('还不能记录，请刷新页面后再试。');
       return listDailyLogs(coupleId);
     },
     enabled: !!coupleId,
@@ -39,8 +39,8 @@ export const useDailyLogByDate = (logDate: string | undefined) => {
   return useQuery({
     queryKey: dailyLogByDateKey(coupleId, logDate ?? ''),
     queryFn: () => {
-      if (!coupleId) throw new Error('useDailyLogByDate called without active couple');
-      if (!logDate) throw new Error('useDailyLogByDate called without logDate');
+      if (!coupleId) throw new Error('还不能记录，请刷新页面后再试。');
+      if (!logDate) throw new Error('还不能记录，请刷新页面后再试。');
       return getDailyLog(coupleId, logDate);
     },
     enabled: !!coupleId && !!logDate,

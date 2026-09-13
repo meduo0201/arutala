@@ -2,6 +2,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useE2eeBootstrap } from '@/features/e2ee/hooks/use-e2ee';
 import { useTranslation } from '@/lib/i18n';
+import { isSupabaseConfigured } from '@/lib/supabase';
 
 /**
  * Wrap routes yang perlu authenticated session.
@@ -18,6 +19,14 @@ export const ProtectedRoute = () => {
   // Bootstrap E2EE state once auth resolved (read profile.encryption_salt + verifier
   // → set 'not_setup' / 'locked' / leave 'unknown' until user authenticated).
   useE2eeBootstrap();
+
+  if (!isSupabaseConfigured) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center px-6 text-center">
+        <p className="text-sm text-muted-foreground">{t('error.config')}</p>
+      </div>
+    );
+  }
 
   if (!initialized) {
     return (
