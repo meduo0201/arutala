@@ -1,5 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
-import { resolveSupabaseUrl } from '@/lib/supabase-proxy';
+import {
+  resolveSupabaseUrl,
+  SUPABASE_UPSTREAM_ORIGIN,
+} from '@/lib/supabase-proxy';
 
 // Accept both legacy JWT anon keys and the newer `sb_publishable_...` keys.
 // supabase-js 2.49+ sends the key as `apikey` without requiring JWT shape.
@@ -27,6 +30,9 @@ export const supabase = createClient(
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
+      // Keep the existing localStorage key so switching VITE_SUPABASE_URL
+      // from *.supabase.co to the same-origin proxy does not sign users out.
+      storageKey: `sb-${new URL(SUPABASE_UPSTREAM_ORIGIN).hostname.split('.')[0]}-auth-token`,
     },
     global: {
       headers: {
