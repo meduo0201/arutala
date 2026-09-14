@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { extractErrorMessage, formatUserError } from './user-error';
+import {
+  extractErrorMessage,
+  formatUserError,
+  NETWORK_FAILURE_MESSAGE,
+} from './user-error';
 
 describe('formatUserError', () => {
   it('maps invalid login credentials', () => {
@@ -43,6 +47,26 @@ describe('formatUserError', () => {
 
   it('uses a custom fallback', () => {
     expect(formatUserError(null, '保存失败，请重试。')).toBe('保存失败，请重试。');
+  });
+
+  it('maps browser / auth network failures to a clear Chinese retry message', () => {
+    expect(formatUserError(new TypeError('Failed to fetch'))).toBe(
+      NETWORK_FAILURE_MESSAGE,
+    );
+    expect(formatUserError(new Error('请求失败'))).toBe(NETWORK_FAILURE_MESSAGE);
+    expect(
+      formatUserError({
+        name: 'AuthRetryableFetchError',
+        message: 'Failed to fetch',
+        status: 0,
+      }),
+    ).toBe(NETWORK_FAILURE_MESSAGE);
+    expect(formatUserError({ status: 0, message: '' })).toBe(
+      NETWORK_FAILURE_MESSAGE,
+    );
+    expect(formatUserError(new TypeError('Cannot read properties of null'))).toBe(
+      '出错了，请再试一次。',
+    );
   });
 });
 

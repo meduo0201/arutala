@@ -129,6 +129,29 @@ Git fork, set the same `.env` variables in the Pages dashboard, and use
 `pnpm build` as the build command (output `dist/`). It is otherwise a plain
 SPA and will work on any static host.
 
+#### Cloudflare Pages + mainland China
+
+Browsers in mainland China often cannot reach `*.supabase.co` even when the
+static site on Cloudflare loads. A Pages Function at `functions/supabase/`
+reverse-proxies `/supabase/*` (HTTP + Realtime WebSocket) to the Supabase
+project. The browser must only talk to your own domain.
+
+Set these **Production** environment variables in the Pages dashboard, then
+**redeploy** (Vite bakes `VITE_*` into the bundle at build time):
+
+```
+VITE_SUPABASE_URL=https://20270227.xyz/supabase
+VITE_SUPABASE_ANON_KEY=sb_publishable_...
+```
+
+Keep `VITE_SUPABASE_ANON_KEY` as the publishable / anon key. Do not put the
+`service_role` key in Pages env. Optional server-only override for the
+Function/Vite proxy target: `SUPABASE_UPSTREAM_URL`.
+
+本地开发：`.env.local` 里设 `VITE_SUPABASE_URL=/supabase`，Vite 会把
+`/supabase` 代理到上游 Supabase。生产环境必须在 Pages 里设置
+`VITE_SUPABASE_URL=https://20270227.xyz/supabase` 并重新部署。
+
 ## Internationalization
 
 The app ships with Indonesian (default) and English. Strings live in

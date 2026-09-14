@@ -1,5 +1,8 @@
 # Cloudflare Pages headers — security + caching.
 # Reference: https://developers.cloudflare.com/pages/configuration/headers/
+#
+# connect-src 'self' covers same-origin /supabase (HTTP + wss Realtime via the
+# Pages Function). Production clients must not depend on browser → *.supabase.co.
 
 /*
   X-Content-Type-Options: nosniff
@@ -12,7 +15,7 @@
   Cross-Origin-Embedder-Policy: credentialless
   X-DNS-Prefetch-Control: off
   X-Permitted-Cross-Domain-Policies: none
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.supabase.com https://api.pwnedpasswords.com; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; manifest-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://api.pwnedpasswords.com; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; manifest-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests
   ! Server
 
 # HTML: short cache (SW handles updates)

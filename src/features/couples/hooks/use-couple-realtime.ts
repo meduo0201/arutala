@@ -77,7 +77,14 @@ export const useCoupleRealtime = (coupleId: string | undefined) => {
           void queryClient.invalidateQueries({ queryKey: coupleQueryKey(user.id) });
         },
       )
-      .subscribe();
+      .subscribe((status) => {
+        // Realtime is best-effort. If the proxied WebSocket is blocked or
+        // drops, HTTP queries still work — tear the channel down so supabase-js
+        // does not retry forever in the background.
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          void supabase.removeChannel(channel);
+        }
+      });
 
     return () => {
       void supabase.removeChannel(channel);

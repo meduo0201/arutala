@@ -1,3 +1,6 @@
 # Cloudflare Pages SPA fallback: route semua URL ke index.html (200 status).
 # Tanpa ini, refresh di /login atau /couple-setup → 404.
+#
+# `/supabase/*` is handled by functions/supabase/[[path]].ts (higher priority
+# than this rewrite). Do not add a catch-all that races the proxy.
 /*  /index.html  200

@@ -4,6 +4,21 @@ import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'node:path';
 
+const supabaseUpstream =
+  process.env.SUPABASE_UPSTREAM_URL?.trim() ||
+  'https://iodarvjowrubfatokpxt.supabase.co';
+
+const supabaseDevProxy = {
+  '/supabase': {
+    target: supabaseUpstream,
+    changeOrigin: true,
+    secure: true,
+    ws: true,
+    rewrite: (requestPath: string) =>
+      requestPath.replace(/^\/supabase/, '') || '/',
+  },
+};
+
 // `defineConfig` di-import dari `vitest/config` (bukan `vite`) supaya TS recognize
 // `test` field tanpa perlu triple-slash reference. Behavior Vite tetap identik.
 //
@@ -66,6 +81,13 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+  },
+  // Local / preview: same `/supabase` prefix as Cloudflare Pages Functions.
+  server: {
+    proxy: supabaseDevProxy,
+  },
+  preview: {
+    proxy: supabaseDevProxy,
   },
   build: {
     // Bundle splitting: keep vendor code in stable, cacheable chunks so route-
