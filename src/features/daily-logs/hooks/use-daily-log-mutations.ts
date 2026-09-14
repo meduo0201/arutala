@@ -12,6 +12,7 @@ import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useCouple } from '@/features/couples/hooks/use-couple';
 import type { DailyLogFormInput } from '@/features/daily-logs/schemas';
 import { useTranslation } from '@/lib/i18n';
+import { formatUserError } from '@/lib/user-error';
 
 // Helper: invalidate all daily-logs queries setelah mutation.
 const useInvalidateDailyLogs = () => {
@@ -67,8 +68,8 @@ export const useUpsertDailyLog = () => {
       invalidate(data.log_date);
       toast.success(t('toast.daily-log.saved'));
     },
-    onError: () => {
-      toast.error(t('toast.error.generic'));
+    onError: (error) => {
+      toast.error(formatUserError(error, t('toast.error.generic')));
     },
   });
 };
@@ -84,8 +85,8 @@ export const useDeleteDailyLog = () => {
       invalidate();
       toast.success(t('toast.daily-log.deleted'));
     },
-    onError: () => {
-      toast.error(t('toast.error.generic'));
+    onError: (error) => {
+      toast.error(formatUserError(error, t('toast.error.generic')));
     },
   });
 };

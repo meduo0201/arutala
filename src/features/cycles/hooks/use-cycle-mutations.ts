@@ -13,6 +13,7 @@ import {
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useCouple } from '@/features/couples/hooks/use-couple';
 import { useTranslation } from '@/lib/i18n';
+import { formatUserError } from '@/lib/user-error';
 
 // Helper: invalidate semua cycle queries setelah mutation.
 const useInvalidateCycles = () => {
@@ -53,8 +54,8 @@ export const useStartPeriod = () => {
       invalidate();
       toast.success(t('toast.period.started'));
     },
-    onError: () => {
-      toast.error(t('toast.error.generic'));
+    onError: (error) => {
+      toast.error(formatUserError(error, t('toast.error.generic')));
     },
   });
 };
@@ -74,8 +75,8 @@ export const useEndPeriod = () => {
       invalidate();
       toast.success(t('toast.period.ended'));
     },
-    onError: () => {
-      toast.error(t('toast.error.generic'));
+    onError: (error) => {
+      toast.error(formatUserError(error, t('toast.error.generic')));
     },
   });
 };
@@ -93,8 +94,8 @@ export const useUpdateCycle = () => {
       invalidate();
       toast.success(t('toast.cycle.saved'));
     },
-    onError: () => {
-      toast.error(t('toast.error.generic'));
+    onError: (error) => {
+      toast.error(formatUserError(error, t('toast.error.generic')));
     },
   });
 };
@@ -112,8 +113,8 @@ export const useDeleteCycle = () => {
       invalidate();
       toast.success(t('toast.cycle.deleted'));
     },
-    onError: () => {
-      toast.error(t('toast.error.generic'));
+    onError: (error) => {
+      toast.error(formatUserError(error, t('toast.error.generic')));
     },
   });
 };

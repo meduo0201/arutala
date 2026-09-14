@@ -41,7 +41,7 @@ const zh = {
   'common.loading': '加载中…',
   'common.close': '关闭',
   'common.retry': '重试',
-  'error.load-failed': '加载失败，请检查网络后重试。',
+  'error.load-failed': '网络连接失败，请稍后重试',
   'error.config': '应用还没有配置完成，暂时无法连接。',
   'error.household': '还不能开始记录，请刷新页面后再试。',
   'error.crash': '页面出了点问题',

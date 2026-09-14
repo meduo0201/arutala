@@ -5,6 +5,14 @@ this file focuses on what shipped.
 
 ## Unreleased
 
+### Fixes
+
+- Browser traffic to Supabase now goes through same-origin `/supabase` on
+  Cloudflare Pages (HTTP + Realtime WebSocket proxy), so clients in mainland
+  China no longer need a direct connection to `*.supabase.co`.
+- Network failures show 「网络连接失败，请稍后重试」 instead of opaque
+  `Failed to fetch` / 「请求失败」.
+
 ### QA
 
 - Auth server errors map to Simplified Chinese toasts and inline copy

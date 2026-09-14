@@ -13,6 +13,7 @@ export default tseslint.config(
       'src/lib/database-types.ts', // auto-generated dari Supabase
       'supabase/migrations',
       'public',
+      'functions',
     ],
   },
   {

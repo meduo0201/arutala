@@ -2,6 +2,36 @@ const CJK = /[\u4e00-\u9fff]/;
 
 const AUTH_INVALID = '账号或密码错误';
 const AUTH_TAKEN = '该账号已注册';
+export const NETWORK_FAILURE_MESSAGE = '网络连接失败，请稍后重试';
+
+const NETWORK_ERROR_NAMES = new Set([
+  'AuthRetryableFetchError',
+  'NetworkError',
+  'FetchError',
+]);
+
+const NETWORK_MESSAGE =
+  /failed to fetch|networkerror|load failed|network request failed|fetch failed|err_network|err_internet|err_connection|econnreset|econnrefused|enotfound|network error|请求失败|网络异常/i;
+
+const isNetworkFailure = (error: unknown): boolean => {
+  if (!error) return false;
+  if (typeof error === 'string') return NETWORK_MESSAGE.test(error);
+  if (typeof error !== 'object') return false;
+
+  const e = error as {
+    name?: string;
+    status?: number;
+    message?: unknown;
+    code?: string;
+  };
+  if (e.name && NETWORK_ERROR_NAMES.has(e.name)) return true;
+  if (e.status === 0) return true;
+  if (typeof e.code === 'string' && /network|econn|enotfound|etimedout/i.test(e.code)) {
+    return true;
+  }
+  if (typeof e.message === 'string' && NETWORK_MESSAGE.test(e.message)) return true;
+  return false;
+};
 
 const CODE_MAPPINGS: Readonly<Record<string, string>> = {
   invalid_credentials: AUTH_INVALID,
@@ -28,7 +58,7 @@ const MAPPINGS: ReadonlyArray<readonly [RegExp, string]> = [
   [/email rate limit|over_email_send_rate_limit/i, '操作太频繁，请稍后再试。'],
   [/rate limit|too many requests|over_request_rate_limit/i, '操作太频繁，请稍后再试。'],
   [/captcha/i, '验证未通过，请重试。'],
-  [/failed to fetch|networkerror|load failed|network request failed/i, '网络异常，请检查连接后重试。'],
+  [/failed to fetch|networkerror|load failed|network request failed|fetch failed|请求失败/i, NETWORK_FAILURE_MESSAGE],
   [/jwt expired|invalid jwt|session expired/i, '登录已过期，请重新登录。'],
   [/not authenticated|auth session missing/i, '请先登录。'],
   [/permission denied|row-level security|violates row-level|rls/i, '没有权限完成此操作。'],
@@ -76,6 +106,7 @@ export const formatUserError = (
 ): string => {
   const code = extractErrorCode(error);
   if (code && CODE_MAPPINGS[code]) return CODE_MAPPINGS[code];
+  if (isNetworkFailure(error)) return NETWORK_FAILURE_MESSAGE;
 
   const raw = extractErrorMessage(error).trim();
   if (!raw) return fallback;
