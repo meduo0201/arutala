@@ -32,12 +32,12 @@ const PrivacyPage = () => {
         <Link
           to={backTo}
           aria-label={t('settings.back')}
-          className="inline-flex size-11 items-center justify-center rounded-md text-foreground hover:bg-muted -ml-2"
+          className="inline-flex size-11 items-center justify-center rounded-full text-foreground hover:bg-muted -ml-2"
         >
           <ChevronLeft className="size-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="page-heading text-[1.7rem]">
             {t('privacy.title')}
           </h1>
           <p className="text-xs text-muted-foreground">
@@ -198,7 +198,7 @@ const PrivacyPage = () => {
           href={PRIVACY_NOTICE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex min-h-12 items-center justify-between rounded-md border border-border px-4 py-3 text-sm hover:bg-muted/50 transition-colors"
+          className="surface-link"
         >
           <span className="font-medium">{t('privacy.full-text-link')}</span>
           <ExternalLink className="size-4 text-muted-foreground" />

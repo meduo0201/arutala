@@ -10,7 +10,7 @@ export const OptionalAuthLayout = () => {
 
   if (!initialized) {
     return (
-      <div className="min-h-dvh flex items-center justify-center bg-background">
+      <div className="flex min-h-dvh items-center justify-center">
         <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
       </div>
     );

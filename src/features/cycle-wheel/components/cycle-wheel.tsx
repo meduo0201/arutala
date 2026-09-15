@@ -56,9 +56,9 @@ export const CycleWheel = () => {
 
   if (cycles.isLoading) {
     return (
-      <Card>
-        <CardContent className="py-8 flex justify-center">
-          <div className="size-[260px] rounded-full bg-muted animate-pulse" />
+      <Card className="overflow-hidden border-0 bg-gradient-to-b from-card via-card to-secondary/50">
+        <CardContent className="flex justify-center py-8">
+          <div className="size-[260px] animate-pulse rounded-full bg-muted" />
         </CardContent>
       </Card>
     );
@@ -68,8 +68,8 @@ export const CycleWheel = () => {
 
   if (!lastCycle) {
     return (
-      <Card>
-        <CardContent className="py-10 text-center space-y-3">
+      <Card className="overflow-hidden border-0 bg-gradient-to-b from-card via-card to-secondary/50">
+        <CardContent className="space-y-3 py-12 text-center">
           <motion.div
             className="text-5xl"
             initial={reduced ? false : { scale: 0, rotate: -10 }}
@@ -147,8 +147,8 @@ export const CycleWheel = () => {
   const indicator = polarToCartesian(CENTER, CENTER, RADIUS, indicatorAngle);
 
   return (
-    <Card>
-      <CardContent className="py-6">
+    <Card className="overflow-hidden border-0 bg-gradient-to-b from-card via-card to-secondary/45">
+      <CardContent className="py-7">
         <div className="flex justify-center">
           <svg
             viewBox={`0 0 ${SIZE} ${SIZE}`}
@@ -255,10 +255,11 @@ export const CycleWheel = () => {
               x={CENTER}
               y={CENTER + 12}
               textAnchor="middle"
-              fontSize="40"
+              fontSize="42"
               fontWeight="600"
               fill="currentColor"
               className="fill-foreground"
+              fontFamily="var(--font-display)"
               initial={{ opacity: reduced ? 1 : 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: reduced ? 0 : TEXT_DELAY, duration: 0.4 }}
@@ -284,7 +285,7 @@ export const CycleWheel = () => {
         {/* Phase label below */}
         <p
           className={cn(
-            'text-center text-sm font-medium mt-3',
+            'mt-4 text-center text-sm font-medium tracking-wide',
             phase === 'period' && 'text-period',
             phase === 'fertile' && 'text-fertile',
             phase === 'ovulation' && 'text-ovulation',

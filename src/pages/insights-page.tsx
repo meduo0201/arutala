@@ -13,7 +13,7 @@ const InsightsPage = () => {
   return (
     <PageShell>
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="page-heading text-[1.7rem]">
           {t('page.insights.title')}
         </h1>
       </header>
@@ -25,7 +25,7 @@ const InsightsPage = () => {
 
       <Link
         to="/logs"
-        className="flex min-h-12 items-center justify-between rounded-md border border-border px-4 py-3 text-sm hover:bg-muted/50 transition-colors"
+        className="surface-link"
       >
         <span className="font-medium">{t('logs.view-all')}</span>
         <ChevronRight className="size-4 text-muted-foreground" />

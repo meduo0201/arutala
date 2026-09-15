@@ -59,15 +59,15 @@ export const CycleCalendar = () => {
             }}
             modifiersClassNames={{
               period:
-                'bg-period text-white hover:bg-period/90 hover:text-white aria-selected:bg-period aria-selected:text-white rounded-full',
+                'bg-period/22 text-period hover:bg-period/30 hover:text-period aria-selected:bg-period/28 aria-selected:text-period rounded-full',
               fertilePred:
-                'bg-fertile/30 text-foreground hover:bg-fertile/40 rounded-full',
+                'bg-fertile/28 text-foreground hover:bg-fertile/40 rounded-full',
               ovulationPred:
-                'bg-ovulation text-white hover:bg-ovulation/90 hover:text-white rounded-full',
+                'bg-ovulation/80 text-white hover:bg-ovulation hover:text-white rounded-full',
               nextPeriodPred:
-                'border-2 border-period text-period hover:bg-period/10 rounded-full',
+                'border-2 border-period/55 text-period hover:bg-period/10 rounded-full',
             }}
-            className="rounded-md"
+            className="rounded-2xl"
           />
         </CardContent>
       </Card>

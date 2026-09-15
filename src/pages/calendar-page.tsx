@@ -9,7 +9,7 @@ const CalendarPage = () => {
   return (
     <PageShell>
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="page-heading text-[1.7rem]">
           {t('page.calendar.title')}
         </h1>
       </header>

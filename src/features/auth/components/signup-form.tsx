@@ -62,7 +62,7 @@ export const SignupForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
         <FormField
           control={form.control}
           name="username"
@@ -148,6 +148,7 @@ export const SignupForm = () => {
 
         <Button
           type="submit"
+          size="lg"
           className="w-full"
           disabled={signUp.isPending || (turnstileEnabled && !captchaToken)}
         >

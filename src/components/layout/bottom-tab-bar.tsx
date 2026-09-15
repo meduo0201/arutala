@@ -3,11 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useTranslation, type MessageKey } from '@/lib/i18n';
 
-// 4-tab persistent bottom navigation. Mobile-native pattern (Apple HIG / Material).
-// Position: fixed bottom + safe-area inset (iOS notch). 64px height + ~12px safe-area
-// → ~76px total reserved space. Pages should pb-20 minimum.
-//
-// Active state: filled icon + primary color text. Inactive: outline icon + muted.
+// Floating pill tab bar. Active: filled chip + primary ink. Inactive: muted.
 
 interface TabDef {
   to: string;
@@ -29,13 +25,9 @@ export const BottomTabBar = () => {
   return (
     <nav
       aria-label="主导航"
-      className={cn(
-        'fixed bottom-0 inset-x-0 z-40',
-        'border-t border-border bg-background/95 backdrop-blur',
-        'pb-[env(safe-area-inset-bottom)]',
-      )}
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
     >
-      <ul className="max-w-md mx-auto flex items-stretch justify-around px-2">
+      <ul className="pointer-events-auto mx-auto flex max-w-[28rem] items-stretch justify-around gap-1 rounded-full border border-border/60 bg-card/80 px-1.5 py-1.5 shadow-[var(--shadow-float)] backdrop-blur-xl">
         {TABS.map(({ to, labelKey, Icon, end }) => (
           <li key={to} className="flex-1">
             <NavLink
@@ -44,10 +36,10 @@ export const BottomTabBar = () => {
               aria-label={t(labelKey)}
               className={({ isActive }) =>
                 cn(
-                  'flex flex-col items-center justify-center gap-1',
-                  'h-[4.25rem] min-w-16 select-none touch-manipulation transition-colors',
+                  'flex h-14 min-w-14 flex-col items-center justify-center gap-0.5 rounded-full',
+                  'select-none touch-manipulation transition-colors',
                   isActive
-                    ? 'text-primary'
+                    ? 'bg-primary/14 text-primary'
                     : 'text-muted-foreground hover:text-foreground',
                 )
               }
@@ -55,10 +47,10 @@ export const BottomTabBar = () => {
               {({ isActive }) => (
                 <>
                   <Icon
-                    className={cn('size-6', isActive && 'fill-primary/15')}
+                    className={cn('size-5', isActive && 'fill-primary/20')}
                     aria-hidden="true"
                   />
-                  <span className="text-xs leading-none font-medium">
+                  <span className="text-[0.68rem] font-medium leading-none">
                     {t(labelKey)}
                   </span>
                 </>

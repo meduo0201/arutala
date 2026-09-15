@@ -14,18 +14,22 @@ const LoginPage = () => {
   const { t } = useTranslation();
 
   return (
-    <PageShell variant="auth" className="justify-center">
-      <div className="mb-6 flex flex-col items-center gap-2 text-center">
-        <img src="/logo.svg" alt="" aria-hidden="true" className="size-14" />
-        <p className="text-lg font-semibold tracking-tight">{t('app.name')}</p>
-        <p className="text-xs text-muted-foreground max-w-[16rem]">
+    <PageShell variant="auth" className="justify-center gap-8">
+      <div className="flex flex-col items-center gap-3 text-center">
+        <img src="/logo.svg" alt="" aria-hidden="true" className="size-16" />
+        <p className="page-heading text-2xl">{t('app.name')}</p>
+        <p className="max-w-[18rem] text-sm leading-relaxed text-muted-foreground">
           {t('app.tagline')}
         </p>
       </div>
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="text-2xl">{t('auth.login.title')}</CardTitle>
-          <CardDescription>{t('auth.login.description')}</CardDescription>
+      <Card className="w-full px-1">
+        <CardHeader className="gap-2.5">
+          <CardTitle className="page-heading text-2xl">
+            {t('auth.login.title')}
+          </CardTitle>
+          <CardDescription className="text-sm leading-relaxed">
+            {t('auth.login.description')}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {isSupabaseConfigured ? (

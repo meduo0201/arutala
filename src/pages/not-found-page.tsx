@@ -8,7 +8,7 @@ const NotFoundPage = () => {
   return (
     <PageShell variant="auth" className="justify-center text-center">
       <div className="w-full space-y-3">
-        <h1 className="text-4xl font-semibold tracking-tight">{t('not-found.title')}</h1>
+        <h1 className="page-heading text-4xl">{t('not-found.title')}</h1>
         <p className="text-muted-foreground">{t('not-found.message')}</p>
         <Link
           to="/"

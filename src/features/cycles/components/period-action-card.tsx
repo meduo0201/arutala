@@ -43,7 +43,7 @@ export const PeriodActionCard = () => {
           <Skeleton className="h-4 w-56" />
         </CardHeader>
         <CardContent className="space-y-3">
-          <Skeleton className="h-14 w-full rounded-md" />
+          <Skeleton className="h-14 w-full rounded-2xl" />
         </CardContent>
       </Card>
     );

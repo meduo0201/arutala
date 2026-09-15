@@ -67,7 +67,7 @@ export const CycleList = () => {
                     <button
                       type="button"
                       onClick={() => setEditingCycle(cycle)}
-                      className="w-full py-3 flex items-center justify-between text-sm hover:bg-muted/50 -mx-3 px-3 rounded transition-colors text-left"
+                      className="-mx-3 flex w-full items-center justify-between rounded-2xl px-3 py-3.5 text-left text-sm transition-colors hover:bg-muted/50"
                     >
                       <span className="font-medium">
                         {formatDate(cycle.start_date, locale)}
