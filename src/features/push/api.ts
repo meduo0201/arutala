@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { waitForServiceWorkerReady } from '@/features/push/sw-ready';
 
 // Convert ArrayBuffer → URL-safe base64 (web-push format).
 const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
@@ -60,7 +61,7 @@ export const subscribePush = async (
     throw new Error('当前浏览器不支持此功能。');
   }
 
-  const registration = await navigator.serviceWorker.ready;
+  const registration = await waitForServiceWorkerReady(navigator.serviceWorker);
   const existing = await registration.pushManager.getSubscription();
   let subscription = existing;
   if (!subscription) {
@@ -86,7 +87,7 @@ export const subscribePush = async (
 // Unsubscribe locally + soft-delete server-side.
 export const unsubscribePush = async (): Promise<void> => {
   if (!('serviceWorker' in navigator)) return;
-  const registration = await navigator.serviceWorker.ready;
+  const registration = await waitForServiceWorkerReady(navigator.serviceWorker);
   const sub = await registration.pushManager.getSubscription();
   if (!sub) return;
 
@@ -105,7 +106,7 @@ export const getCurrentBrowserSubscription = async (): Promise<PushSubscription 
   if (!('serviceWorker' in navigator)) return null;
   if (!('PushManager' in window)) return null;
   try {
-    const registration = await navigator.serviceWorker.ready;
+    const registration = await waitForServiceWorkerReady(navigator.serviceWorker);
     return await registration.pushManager.getSubscription();
   } catch {
     return null;

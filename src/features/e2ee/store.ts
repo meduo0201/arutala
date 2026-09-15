@@ -15,7 +15,12 @@ import { create } from 'zustand';
 //   - 'locked':   profile.encryption_salt set tapi key belum di-derive (post-reload)
 //   - 'unlocked': key derived & cached di memory, ready encrypt/decrypt
 
-export type E2eeStatus = 'unknown' | 'not_setup' | 'locked' | 'unlocked';
+export type E2eeStatus =
+  | 'unknown'
+  | 'not_setup'
+  | 'locked'
+  | 'unlocked'
+  | 'error';
 
 interface E2eeState {
   status: E2eeStatus;
@@ -32,6 +37,8 @@ interface E2eeActions {
   setLocked: (saltBase64: string, encryptedVerifier: string) => void;
   setUnlocked: (key: CryptoKey) => void;
   setNotSetup: () => void;
+  /** Profile query failed — do not treat as "unset". */
+  setLoadError: () => void;
   /** Lock — clear key dari memory. Salt + verifier kept (so we can re-unlock). */
   lock: () => void;
   /** Reset to unknown — saat user logout / akun ganti. */
@@ -55,6 +62,9 @@ export const useE2eeStore = create<E2eeState & E2eeActions>((set) => ({
 
   setNotSetup: () =>
     set({ status: 'not_setup', saltBase64: null, encryptedVerifier: null, key: null }),
+
+  setLoadError: () =>
+    set({ status: 'error', saltBase64: null, encryptedVerifier: null, key: null }),
 
   lock: () => set((s) => ({ ...s, status: 'locked', key: null })),
 

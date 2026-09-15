@@ -9,6 +9,20 @@ export const dailyLogsListKey = (coupleId: string | undefined) =>
 export const dailyLogByDateKey = (coupleId: string | undefined, date: string) =>
   ['daily-logs', 'by-date', coupleId, date] as const;
 
+/** Prefix that matches every by-date query for a couple (F13). */
+export const dailyLogsByDatePrefix = (coupleId: string | undefined) =>
+  ['daily-logs', 'by-date', coupleId] as const;
+
+export const dailyLogInvalidationTargets = (
+  coupleId: string,
+  logDate?: string,
+) => ({
+  list: dailyLogsListKey(coupleId),
+  byDate: logDate
+    ? dailyLogByDateKey(coupleId, logDate)
+    : dailyLogsByDatePrefix(coupleId),
+});
+
 /**
  * List recent daily logs for couple. Default limit 60 (~2 cycles worth).
  * Untuk older history pakai pagination atau date filter (Phase 3 charts).

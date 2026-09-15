@@ -1,21 +1,50 @@
 import { supabase } from '@/lib/supabase';
 
-// Read encryption fields dari profile current user. Used saat init untuk
-// detect E2EE status (not_setup / locked / unlocked-after-derive).
-export const getEncryptionMeta = async (): Promise<{
+export type EncryptionMetaReady = {
+  ok: true;
   encryption_salt: string | null;
   encryption_verifier: string | null;
-} | null> => {
+};
+
+export type EncryptionMetaError = {
+  ok: false;
+  error: Error;
+};
+
+export type EncryptionMetaResult = EncryptionMetaReady | EncryptionMetaError;
+
+export const hasEncryptionMeta = (
+  meta: EncryptionMetaReady,
+): meta is EncryptionMetaReady & {
+  encryption_salt: string;
+  encryption_verifier: string;
+} => Boolean(meta.encryption_salt && meta.encryption_verifier);
+
+// Read encryption fields for the CURRENT user only. Used saat init untuk
+// detect E2EE status (not_setup / locked / unlocked-after-derive).
+// Errors are not treated as "unset" — callers must branch on `ok`.
+export const getEncryptionMeta = async (): Promise<EncryptionMetaResult> => {
+  const { data: userResult, error: userError } = await supabase.auth.getUser();
+  const userId = userResult.user?.id;
+  if (userError || !userId) {
+    return { ok: false, error: new Error('请先登录。') };
+  }
+
   const { data, error } = await supabase
     .from('profiles')
     .select('encryption_salt, encryption_verifier')
-    .single();
+    .eq('id', userId)
+    .maybeSingle();
 
   if (error) {
-    // Profile mungkin belum exist (race) — return null biar caller handle
-    return null;
+    return { ok: false, error: error };
   }
-  return data;
+
+  return {
+    ok: true,
+    encryption_salt: data?.encryption_salt ?? null,
+    encryption_verifier: data?.encryption_verifier ?? null,
+  };
 };
 
 // Save salt + encrypted verifier saat user pertama kali setup passphrase.
@@ -73,8 +102,8 @@ export const disableE2ee = async (): Promise<void> => {
   if (profileErr) throw profileErr;
 
   // Clear all sexual_activity_encrypted owned by user via RLS scope.
-  // Note: RLS gate by couple_id, not user_id, jadi clearing semua di couple.
-  // OK karena disable E2EE = user explicitly nuking all encrypted data.
+  // Note: RLS gate by couple_id, not user_id, jadi extended couple scope.
+  // F06 (disable-encryption scope) is deferred — keep current behavior.
   const { error: logsErr } = await supabase
     .from('daily_logs')
     .update({ sexual_activity_encrypted: null })

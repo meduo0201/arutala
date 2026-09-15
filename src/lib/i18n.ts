@@ -306,6 +306,8 @@ const zh = {
   'e2ee.status.not-setup': '未开启',
   'e2ee.status.locked': '已锁定',
   'e2ee.status.unlocked': '已开启',
+  'e2ee.status.error': '加密状态加载失败',
+  'e2ee.button.retry': '重试',
   'e2ee.button.setup': '开启端到端加密',
   'e2ee.button.unlock': '解锁',
   'e2ee.button.lock': '立即锁定',

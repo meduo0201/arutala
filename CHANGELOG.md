@@ -5,6 +5,25 @@ this file focuses on what shipped.
 
 ## Unreleased
 
+### Security
+
+- Revoke `predicted_next_starts()` / `schedule_period_reminders()` from
+  PUBLIC, anon, and authenticated; cron/service_role only (F01).
+- `send-push` no longer trusts a decoded `role=service_role` JWT. User
+  callers may only target themselves or a verified couple. Payload UUID /
+  length / same-origin URL checks and a basic rate limit (F02).
+- Authenticated clients can no longer UPDATE `couples` directly;
+  relationship changes stay on existing RPCs (F03).
+- Encryption bootstrap filters by the current user and does not treat a
+  load error as “unset” (F05).
+- Same-day re-log after soft-delete restores via `upsert_daily_log` and a
+  partial unique index (F10).
+- Service worker is registered even with `injectRegister: false`; push
+  subscribe no longer waits forever on `serviceWorker.ready` (F11).
+- CSV export prefixes cells that start with `= + - @` (F12).
+- Daily-log by-date queries invalidate when the list changes; realtime
+  reconnects after channel errors (F13).
+
 ### Fixes
 
 - Browser traffic to Supabase now goes through same-origin `/supabase` on

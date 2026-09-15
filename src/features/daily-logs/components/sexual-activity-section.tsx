@@ -85,7 +85,7 @@ export const SexualActivitySection = ({
   }
 
   // locked state — show unlock CTA
-  if (status === 'locked' || status === 'unknown') {
+  if (status === 'locked' || status === 'unknown' || status === 'error') {
     return (
       <SectionFrame title={t('sexual-activity.section.title')}>
         <div className="rounded-md border border-dashed border-border p-3 space-y-2">

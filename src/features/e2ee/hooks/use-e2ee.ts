@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { getEncryptionMeta } from '@/features/e2ee/api';
+import { getEncryptionMeta, hasEncryptionMeta } from '@/features/e2ee/api';
 import { useE2eeStore } from '@/features/e2ee/store';
 import { useAuthStore } from '@/features/auth/store';
 
@@ -17,6 +17,7 @@ export const useE2eeBootstrap = () => {
   const status = useE2eeStore((s) => s.status);
   const setLocked = useE2eeStore((s) => s.setLocked);
   const setNotSetup = useE2eeStore((s) => s.setNotSetup);
+  const setLoadError = useE2eeStore((s) => s.setLoadError);
   const reset = useE2eeStore((s) => s.reset);
 
   useEffect(() => {
@@ -28,11 +29,15 @@ export const useE2eeBootstrap = () => {
     if (status !== 'unknown') return; // already bootstrapped
 
     void getEncryptionMeta().then((meta) => {
-      if (!meta || !meta.encryption_salt || !meta.encryption_verifier) {
+      if (!meta.ok) {
+        setLoadError();
+        return;
+      }
+      if (!hasEncryptionMeta(meta)) {
         setNotSetup();
         return;
       }
       setLocked(meta.encryption_salt, meta.encryption_verifier);
     });
-  }, [initialized, userId, status, reset, setLocked, setNotSetup]);
+  }, [initialized, userId, status, reset, setLocked, setNotSetup, setLoadError]);
 };

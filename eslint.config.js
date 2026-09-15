@@ -12,6 +12,7 @@ export default tseslint.config(
       'node_modules',
       'src/lib/database-types.ts', // auto-generated dari Supabase
       'supabase/migrations',
+      'supabase/functions/send-push/index.ts',
       'public',
       'functions',
     ],

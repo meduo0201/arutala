@@ -272,6 +272,25 @@ export interface Database {
         Args: Record<PropertyKey, never>;
         Returns: undefined;
       };
+      soft_delete_daily_log: {
+        Args: { p_log_id: string };
+        Returns: undefined;
+      };
+      upsert_daily_log: {
+        Args: {
+          p_couple_id: string;
+          p_log_date: string;
+          p_logged_by: string;
+          p_cycle_id?: string | null;
+          p_flow_intensity?: number | null;
+          p_symptoms?: string[];
+          p_moods?: string[];
+          p_notes?: string | null;
+          p_sexual_activity_encrypted?: string | null;
+          p_update_sexual_activity?: boolean;
+        };
+        Returns: Record<string, unknown>;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

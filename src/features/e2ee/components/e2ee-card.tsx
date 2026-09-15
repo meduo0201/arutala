@@ -27,6 +27,7 @@ export const E2eeCard = () => {
   const status = useE2eeStore((s) => s.status);
   const lock = useE2eeStore((s) => s.lock);
   const setNotSetup = useE2eeStore((s) => s.setNotSetup);
+  const reset = useE2eeStore((s) => s.reset);
 
   const [setupOpen, setSetupOpen] = useState(false);
   const [unlockOpen, setUnlockOpen] = useState(false);
@@ -40,6 +41,22 @@ export const E2eeCard = () => {
         </CardHeader>
         <CardContent>
           <Skeleton className="h-10 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (status === 'error') {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t('e2ee.title')}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">{t('e2ee.status.error')}</p>
+          <Button type="button" variant="outline" onClick={() => reset()} className="w-full">
+            {t('e2ee.button.retry')}
+          </Button>
         </CardContent>
       </Card>
     );
