@@ -33,29 +33,29 @@ const HomePage = () => {
 
   return (
     <PageShell>
-      <header className="space-y-2">
-        <div className="flex items-center gap-3">
+      <header className="space-y-3.5">
+        <div className="flex items-center gap-3.5">
           <img
             src="/logo.svg"
             alt=""
             aria-hidden="true"
-            className="size-10 shrink-0"
+            className="size-11 shrink-0"
           />
-          <div className="flex-1 min-w-0">
-            <p className="text-xs text-muted-foreground">{greeting}，</p>
-            <h1 className="text-2xl font-semibold tracking-tight truncate">
+          <div className="min-w-0 flex-1">
+            <p className="text-sm text-muted-foreground">{greeting}，</p>
+            <h1 className="page-heading truncate text-[1.7rem]">
               {displayName}
             </h1>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1.5 text-primary font-medium">
+          <span className="inline-flex items-center gap-1 rounded-full bg-primary/12 px-3 py-1.5 font-medium text-primary">
             <UserIcon className="size-3" />
             {t(roleKey)}
           </span>
           {partner ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1.5 text-muted-foreground">
+            <span className="inline-flex items-center gap-1 rounded-full bg-muted/80 px-3 py-1.5 text-muted-foreground">
               <Heart className="size-3 text-period" />
               {t('home.partner-pill.linked')}{' '}
               <span className="font-medium text-foreground">
@@ -63,7 +63,7 @@ const HomePage = () => {
               </span>
             </span>
           ) : profile?.is_solo ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1.5 text-muted-foreground">
+            <span className="inline-flex items-center gap-1 rounded-full bg-muted/80 px-3 py-1.5 text-muted-foreground">
               {t('home.partner-pill.solo')}
             </span>
           ) : null}

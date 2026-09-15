@@ -62,8 +62,11 @@ this file focuses on what shipped.
 
 ### Style
 
-- Light default theme with a warm blush / rose palette. Dark mode is cocoa-rose
-  rather than icy purple. PWA theme color and logo gradient match.
+- Companion-care visual system: peach → blush → cream page wash, dusty rose
+  (not magenta), Noto Serif SC headlines + Noto Sans SC body, 2xl/3xl cards,
+  floating pill tab bar, and phase colors (menstrual rose / follicular coral /
+  fertile gold / luteal lilac). Dark mode stays warm cocoa.
+- PWA theme color, logo gradient, and CSP font allowlist match the new tokens.
 
 ### Auth / onboarding
 

@@ -39,7 +39,7 @@ export const LoginForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
         <FormField
           control={form.control}
           name="username"
@@ -97,7 +97,7 @@ export const LoginForm = () => {
           </p>
         )}
 
-        <Button type="submit" className="w-full" disabled={signIn.isPending}>
+        <Button type="submit" size="lg" className="w-full" disabled={signIn.isPending}>
           {signIn.isPending ? t('auth.login.submitting') : t('auth.login.submit')}
         </Button>
 

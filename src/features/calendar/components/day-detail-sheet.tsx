@@ -51,7 +51,7 @@ export const DayDetailSheet = ({
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent
           side="bottom"
-          className="rounded-t-xl max-h-[92dvh] overflow-y-auto px-0"
+          className="rounded-t-3xl max-h-[92dvh] overflow-y-auto px-0"
         >
           <SheetHeader className="text-left pb-2">
             <SheetTitle>

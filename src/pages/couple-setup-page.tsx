@@ -24,7 +24,7 @@ const CoupleSetupPage = () => {
   return (
     <PageShell>
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="page-heading text-[1.7rem]">
           {t('couple.setup.title')}
         </h1>
         <p className="text-sm text-muted-foreground">

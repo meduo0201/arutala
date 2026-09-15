@@ -72,7 +72,7 @@ export const InvitationCard = () => {
             </p>
             <div className="flex items-center gap-3">
               <code
-                className="flex-1 font-mono text-2xl font-semibold tracking-[0.3em] text-center py-3 bg-muted rounded-md"
+                className="flex-1 rounded-2xl bg-muted py-3 text-center font-mono text-2xl font-semibold tracking-[0.3em]"
                 aria-label={t('couple.invite.code-a11y')}
               >
                 {code}

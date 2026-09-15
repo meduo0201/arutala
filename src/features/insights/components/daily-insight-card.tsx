@@ -48,7 +48,7 @@ export const DailyInsightCard = () => {
   const insight = pickZhInsight(phase, todayIso());
 
   return (
-    <Card className="bg-gradient-to-br from-primary/5 via-background to-period/5 border-primary/20">
+    <Card className="border-primary/15 bg-gradient-to-br from-primary/8 via-card to-luteal/10">
       <CardHeader className="flex-row items-start justify-between space-y-0 pb-2">
         <CardTitle className="text-base inline-flex items-center gap-2">
           <Sparkles className="size-4 text-primary" aria-hidden="true" />

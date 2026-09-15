@@ -60,11 +60,11 @@ const LogsPage = () => {
           <Link
             to="/"
             aria-label={t('settings.back')}
-            className="inline-flex size-11 items-center justify-center rounded-md text-foreground hover:bg-muted -ml-2"
+            className="inline-flex size-11 items-center justify-center rounded-full text-foreground hover:bg-muted -ml-2"
           >
             <ChevronLeft className="size-5" />
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="page-heading text-[1.7rem]">
             {t('logs.title')}
           </h1>
         </header>

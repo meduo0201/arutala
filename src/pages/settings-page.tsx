@@ -36,11 +36,11 @@ const SettingsPage = () => {
         <Link
           to="/"
           aria-label={t('settings.back')}
-          className="inline-flex size-11 items-center justify-center rounded-md text-foreground hover:bg-muted -ml-2"
+          className="inline-flex size-11 items-center justify-center rounded-full text-foreground hover:bg-muted -ml-2"
         >
           <ChevronLeft className="size-5" />
         </Link>
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="page-heading text-[1.7rem]">
           {t('settings.title')}
         </h1>
       </header>
@@ -119,7 +119,7 @@ const SettingsPage = () => {
 
       <Link
         to="/privacy"
-        className="flex min-h-12 items-center justify-between rounded-md border border-border px-4 py-3 text-sm hover:bg-muted/50 transition-colors"
+        className="surface-link"
       >
         <span className="inline-flex items-center gap-2 font-medium">
           <ShieldCheck className="size-4 text-primary" />
@@ -156,7 +156,7 @@ const SignOutButton = () => {
     <Button
       type="button"
       variant="outline"
-      className="w-full min-h-12 text-destructive hover:text-destructive"
+      className="min-h-12 w-full rounded-2xl text-destructive hover:text-destructive"
       onClick={() => signOut.mutate()}
       disabled={signOut.isPending}
     >

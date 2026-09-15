@@ -42,12 +42,14 @@ export const MfaChallengeGate = ({ onVerified }: MfaChallengeGateProps) => {
   };
 
   return (
-    <div className="min-h-dvh flex items-center justify-center px-6">
-      <Card className="w-full max-w-sm">
+    <div className="flex min-h-dvh items-center justify-center px-6">
+      <Card className="w-full max-w-[22.5rem] px-1">
         <CardHeader>
-          <CardTitle className="text-base">{t('mfa.challenge.title')}</CardTitle>
+          <CardTitle className="page-heading text-xl">
+            {t('mfa.challenge.title')}
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
             {t('mfa.challenge.body')}
           </p>
@@ -70,6 +72,7 @@ export const MfaChallengeGate = ({ onVerified }: MfaChallengeGateProps) => {
           )}
           <Button
             type="button"
+            size="lg"
             className="w-full"
             disabled={code.length !== 6 || pending}
             onClick={() => void handleVerify()}

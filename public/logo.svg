@@ -1,9 +1,9 @@
 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="arutala-grad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#E8829F"/>
-      <stop offset="0.55" stop-color="#F0A3A0"/>
-      <stop offset="1" stop-color="#F2C4B0"/>
+      <stop offset="0" stop-color="#D98990"/>
+      <stop offset="0.55" stop-color="#E8B09A"/>
+      <stop offset="1" stop-color="#F0CDB4"/>
     </linearGradient>
   </defs>
   <path

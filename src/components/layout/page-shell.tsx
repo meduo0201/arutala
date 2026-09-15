@@ -8,20 +8,20 @@ interface PageShellProps {
   variant?: 'app' | 'auth';
 }
 
-/** Mobile-first page frame: phone width, safe-area insets, thumb-friendly padding. */
+/** Mobile-first page frame: ~390px phone width, safe-area insets, airy padding. */
 export const PageShell = ({
   children,
   className,
   variant = 'app',
 }: PageShellProps) => {
   return (
-    <main className="min-h-dvh bg-background text-foreground">
+    <main className="min-h-dvh text-foreground">
       <div
         className={cn(
           'mx-auto w-full',
           variant === 'app'
-            ? 'max-w-md space-y-6 px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[calc(5.75rem+env(safe-area-inset-bottom))]'
-            : 'flex min-h-dvh max-w-sm flex-col justify-start px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]',
+            ? 'max-w-[28rem] space-y-7 px-5 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[calc(7.25rem+env(safe-area-inset-bottom))]'
+            : 'flex min-h-dvh max-w-[22.5rem] flex-col justify-start px-5 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]',
           className,
         )}
       >
