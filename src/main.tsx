@@ -10,7 +10,10 @@ import { queryClient } from '@/lib/query-client';
 import { useLocaleStore } from '@/lib/i18n';
 import { applyTheme, useThemeStore } from '@/stores/theme-store';
 import { initializeAuth } from '@/features/auth/store';
+import { registerPwaServiceWorker } from '@/features/pwa-install/register-sw';
 import '@/globals.css';
+
+void registerPwaServiceWorker();
 
 const root = document.getElementById('root');
 if (!root) {

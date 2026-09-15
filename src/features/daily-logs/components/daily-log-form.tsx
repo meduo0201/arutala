@@ -25,6 +25,7 @@ import {
   type FlowIntensity,
   type SexualActivityPayload,
 } from '@/features/daily-logs/types';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useE2eeStore } from '@/features/e2ee/store';
 import { encrypt } from '@/lib/crypto';
 import { useTranslation } from '@/lib/i18n';
@@ -43,6 +44,7 @@ interface DailyLogFormProps {
 // Auto-load existing entry kalau ada, else empty form.
 export const DailyLogForm = ({ logDate, cycleId, onSaved }: DailyLogFormProps) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const existing = useDailyLogByDate(logDate);
   const symptoms = useSymptomCatalog();
   const moods = useMoodCatalog();
@@ -88,8 +90,11 @@ export const DailyLogForm = ({ logDate, cycleId, onSaved }: DailyLogFormProps) =
     // - Kalau status != unlocked: pass undefined (gak update field).
     // - Kalau active=false dan ada existing ciphertext: clear (set null).
     // - Kalau active=true: encrypt JSON.stringify(payload).
+    const isOwnLog =
+      !existing.data || existing.data.logged_by === user?.id;
+
     let sexualActivityEncrypted: string | null | undefined = undefined;
-    if (e2eeStatus === 'unlocked' && e2eeKey) {
+    if (isOwnLog && e2eeStatus === 'unlocked' && e2eeKey) {
       if (sexualActivity.active) {
         sexualActivityEncrypted = await encrypt(
           JSON.stringify(sexualActivity),
@@ -139,6 +144,7 @@ export const DailyLogForm = ({ logDate, cycleId, onSaved }: DailyLogFormProps) =
   }
 
   const hasExisting = !!existing.data;
+  const isOwnLog = !existing.data || existing.data.logged_by === user?.id;
   const isPending = upsert.isPending || del.isPending;
   const apiError = upsert.error || del.error;
 
@@ -232,12 +238,15 @@ export const DailyLogForm = ({ logDate, cycleId, onSaved }: DailyLogFormProps) =
         )}
       />
 
-      {/* Sexual activity — E2EE-gated section (Phase 4 Track B5) */}
-      <SexualActivitySection
-        encryptedFromServer={existing.data?.sexual_activity_encrypted ?? null}
-        value={sexualActivity}
-        onChange={setSexualActivity}
-      />
+      {isOwnLog ? (
+        <SexualActivitySection
+          encryptedFromServer={existing.data?.sexual_activity_encrypted ?? null}
+          value={sexualActivity}
+          onChange={setSexualActivity}
+        />
+      ) : (
+        <p className="text-xs text-muted-foreground">{t('daily-log.partner-readonly')}</p>
+      )}
 
       {apiError && (
         <p className="text-sm text-destructive" role="alert">
@@ -246,7 +255,7 @@ export const DailyLogForm = ({ logDate, cycleId, onSaved }: DailyLogFormProps) =
       )}
 
       <div className="flex gap-2 pt-2">
-        {hasExisting && (
+        {hasExisting && isOwnLog && (
           <Button
             type="button"
             variant="ghost"
@@ -258,9 +267,11 @@ export const DailyLogForm = ({ logDate, cycleId, onSaved }: DailyLogFormProps) =
             {t('daily-log.delete')}
           </Button>
         )}
-        <Button type="submit" disabled={isPending} className="flex-1">
-          {upsert.isPending ? t('daily-log.saving') : t('daily-log.save')}
-        </Button>
+        {isOwnLog && (
+          <Button type="submit" disabled={isPending} className="flex-1">
+            {upsert.isPending ? t('daily-log.saving') : t('daily-log.save')}
+          </Button>
+        )}
       </div>
     </form>
   );

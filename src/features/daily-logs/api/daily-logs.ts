@@ -2,8 +2,9 @@ import { supabase } from '@/lib/supabase';
 import type { DailyLogRow, FlowIntensity } from '@/features/daily-logs/types';
 
 // API wrappers untuk daily_logs.
-// UNIQUE(couple_id, log_date) di SCHEMA—satu hari satu log per couple.
-// Pakai upsert dengan onConflict supaya same-day re-edit gak error.
+// Live uniqueness is a PARTIAL unique index (couple_id, log_date) WHERE
+// deleted_at IS NULL (migration 0027). Same-day re-log after soft-delete
+// goes through upsert_daily_log, which restores the deleted row.
 //
 // Soft delete via SECURITY DEFINER RPC (migration 0005) untuk hindari
 // PostgREST representation-read RLS issue (deleted_at IS NULL filter).
@@ -27,28 +28,21 @@ interface UpsertParams {
 
 /** Upsert (insert or update) daily log untuk specific date. */
 export const upsertDailyLog = async (params: UpsertParams): Promise<DailyLogRow> => {
-  // Build payload — only include sexual_activity_encrypted kalau caller secara
-  // eksplisit pass-in (undefined = leave existing). Empty string '' / null
-  // = clear field.
-  const payload: Record<string, unknown> = {
-    couple_id: params.couple_id,
-    cycle_id: params.cycle_id ?? null,
-    log_date: params.log_date,
-    flow_intensity: params.flow_intensity ?? null,
-    symptoms: params.symptoms ?? [],
-    moods: params.moods ?? [],
-    notes: params.notes ?? null,
-    logged_by: params.logged_by,
-  };
-  if (params.sexual_activity_encrypted !== undefined) {
-    payload['sexual_activity_encrypted'] = params.sexual_activity_encrypted;
-  }
-
-  const { data, error } = await supabase
-    .from('daily_logs')
-    .upsert(payload, { onConflict: 'couple_id,log_date' })
-    .select()
-    .single();
+  const { data, error } = await supabase.rpc('upsert_daily_log', {
+    p_couple_id: params.couple_id,
+    p_log_date: params.log_date,
+    p_logged_by: params.logged_by,
+    p_cycle_id: params.cycle_id ?? null,
+    p_flow_intensity: params.flow_intensity ?? null,
+    p_symptoms: params.symptoms ?? [],
+    p_moods: params.moods ?? [],
+    p_notes: params.notes ?? null,
+    p_sexual_activity_encrypted:
+      params.sexual_activity_encrypted !== undefined
+        ? params.sexual_activity_encrypted
+        : null,
+    p_update_sexual_activity: params.sexual_activity_encrypted !== undefined,
+  });
 
   if (error) {
     console.error('[daily-logs] upsertDailyLog error:', error);

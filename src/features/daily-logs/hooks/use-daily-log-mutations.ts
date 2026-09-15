@@ -4,10 +4,7 @@ import {
   deleteDailyLog,
   upsertDailyLog,
 } from '@/features/daily-logs/api/daily-logs';
-import {
-  dailyLogByDateKey,
-  dailyLogsListKey,
-} from '@/features/daily-logs/hooks/use-daily-logs';
+import { dailyLogInvalidationTargets } from '@/features/daily-logs/hooks/use-daily-logs';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useCouple } from '@/features/couples/hooks/use-couple';
 import type { DailyLogFormInput } from '@/features/daily-logs/schemas';
@@ -22,12 +19,9 @@ const useInvalidateDailyLogs = () => {
 
   return (logDate?: string) => {
     if (!coupleId) return;
-    void queryClient.invalidateQueries({ queryKey: dailyLogsListKey(coupleId) });
-    if (logDate) {
-      void queryClient.invalidateQueries({
-        queryKey: dailyLogByDateKey(coupleId, logDate),
-      });
-    }
+    const keys = dailyLogInvalidationTargets(coupleId, logDate);
+    void queryClient.invalidateQueries({ queryKey: keys.list });
+    void queryClient.invalidateQueries({ queryKey: keys.byDate });
   };
 };
 

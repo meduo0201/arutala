@@ -12,6 +12,8 @@ export default tseslint.config(
       'node_modules',
       'src/lib/database-types.ts', // auto-generated dari Supabase
       'supabase/migrations',
+      'supabase/functions/send-push/index.ts',
+      'supabase/functions/purge-deleted-accounts/index.ts',
       'public',
       'functions',
     ],

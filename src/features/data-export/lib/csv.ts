@@ -1,11 +1,18 @@
 import type { CycleRow } from '@/features/cycles/types';
 import type { DailyLogRow } from '@/features/daily-logs/types';
 
+// Prefix that makes Excel / LibreOffice treat the cell as text, not a formula.
+const FORMULA_INJECTION = /^[=+\-@\t\r]/;
+
 // CSV escape: kalau cell punya comma/quote/newline, wrap dengan double-quotes
-// + escape internal quotes by doubling.
-const csvCell = (v: string | number | null | undefined): string => {
+// + escape internal quotes by doubling. Leading = + - @ are prefixed so a
+// downloaded file cannot execute formulas (F12).
+export const csvCell = (v: string | number | null | undefined): string => {
   if (v === null || v === undefined) return '';
-  const s = String(v);
+  let s = String(v);
+  if (FORMULA_INJECTION.test(s)) {
+    s = `'${s}`;
+  }
   if (/[",\n\r]/.test(s)) {
     return `"${s.replace(/"/g, '""')}"`;
   }
