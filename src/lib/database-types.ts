@@ -291,6 +291,22 @@ export interface Database {
         };
         Returns: Record<string, unknown>;
       };
+      disable_e2ee: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
+      delete_account: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
+      assert_account_active: {
+        Args: Record<PropertyKey, never>;
+        Returns: string;
+      };
+      purge_deleted_accounts: {
+        Args: { p_older_than?: string };
+        Returns: { user_id: string }[];
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

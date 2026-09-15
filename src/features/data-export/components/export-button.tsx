@@ -1,27 +1,38 @@
 import { useState } from 'react';
 import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useCycles } from '@/features/cycles/hooks/use-cycles';
-import { useDailyLogs } from '@/features/daily-logs/hooks/use-daily-logs';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 import { buildExportCsv, downloadCsv } from '@/features/data-export/lib/csv';
+import {
+  exportCsvOmitsIntimate,
+  listAllMyCycles,
+  listAllMyDailyLogs,
+} from '@/features/data-export/lib/personal-export';
 import { todayIso } from '@/lib/format-date';
 import { useTranslation } from '@/lib/i18n';
+import { formatUserError } from '@/lib/user-error';
+import { toast } from 'sonner';
 
 export const ExportButton = () => {
   const { t } = useTranslation();
-  const cycles = useCycles();
-  const logs = useDailyLogs();
+  const { user } = useAuth();
   const [exporting, setExporting] = useState(false);
 
   const handleExport = async () => {
-    if (!cycles.data || !logs.data) return;
+    if (!user) return;
     setExporting(true);
     try {
-      // Yield to UI thread biar button state visible (non-blocking)
-      await new Promise((resolve) => setTimeout(resolve, 50));
-      const csv = buildExportCsv(cycles.data, logs.data);
-      const filename = `arutala-export-${todayIso()}.csv`;
-      downloadCsv(csv, filename);
+      const [cycles, logs] = await Promise.all([
+        listAllMyCycles(user.id),
+        listAllMyDailyLogs(user.id),
+      ]);
+      const csv = buildExportCsv(cycles, logs);
+      if (!exportCsvOmitsIntimate(csv)) {
+        throw new Error('导出失败：结果含有不应导出的字段。');
+      }
+      downloadCsv(csv, `arutala-export-${todayIso()}.csv`);
+    } catch (error) {
+      toast.error(formatUserError(error, t('toast.error.generic')));
     } finally {
       setExporting(false);
     }
@@ -32,8 +43,8 @@ export const ExportButton = () => {
       type="button"
       variant="outline"
       size="sm"
-      onClick={handleExport}
-      disabled={exporting || !cycles.data || !logs.data}
+      onClick={() => void handleExport()}
+      disabled={exporting || !user}
     >
       <Download className="size-4 mr-2" />
       {exporting ? t('export.exporting') : t('export.button')}

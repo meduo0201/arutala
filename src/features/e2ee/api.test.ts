@@ -1,16 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { getEncryptionMeta, hasEncryptionMeta } from '@/features/e2ee/api';
+import { disableE2ee, getEncryptionMeta, hasEncryptionMeta } from '@/features/e2ee/api';
 
 const getUser = vi.fn();
 const maybeSingle = vi.fn();
 const eq = vi.fn();
 const select = vi.fn();
 const from = vi.fn();
+const rpc = vi.fn();
 
 vi.mock('@/lib/supabase', () => ({
   supabase: {
     auth: { getUser: (...args: unknown[]) => getUser(...args) },
     from: (...args: unknown[]) => from(...args),
+    rpc: (...args: unknown[]) => rpc(...args),
   },
 }));
 
@@ -69,5 +71,15 @@ describe('getEncryptionMeta', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) throw new Error('expected ok');
     expect(hasEncryptionMeta(result)).toBe(false);
+  });
+});
+
+describe('disableE2ee (F06 / D4)', () => {
+  it('uses the owner-only RPC instead of a couple-wide table update', async () => {
+    from.mockClear();
+    rpc.mockResolvedValue({ data: null, error: null });
+    await disableE2ee();
+    expect(rpc).toHaveBeenCalledWith('disable_e2ee');
+    expect(from).not.toHaveBeenCalled();
   });
 });

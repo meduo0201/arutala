@@ -44,6 +44,31 @@ describe('F03 couples direct UPDATE migration', () => {
   });
 });
 
+describe('F07–F09 owner scope and deletion migrations', () => {
+  const accept = readMigration('0028_owner_scope_couple_accept.sql');
+  const deletion = readMigration('0029_account_deletion_pipeline.sql');
+
+  it('rejects couple-accept date conflicts in Chinese and never drops rows', () => {
+    expect(accept).toMatch(/无法关联：双方在同一天都有记录/);
+    expect(accept).toMatch(/rehome_owned_rows/);
+    expect(accept).not.toMatch(/and not exists \(/);
+  });
+
+  it('adds owner uniqueness and owner-only writes', () => {
+    expect(accept).toMatch(/daily_logs_owner_date_active_uidx/);
+    expect(accept).toMatch(/Owner update logs/);
+    expect(accept).toMatch(/create or replace function public\.disable_e2ee/);
+  });
+
+  it('soft-deletes only the caller and blocks undelete', () => {
+    expect(deletion).toMatch(/账号已注销，无法自助恢复/);
+    expect(deletion).toMatch(/rehome_owned_rows\(v_partner_id/);
+    expect(deletion).toMatch(/purge_deleted_accounts/);
+    expect(deletion).toMatch(/grant execute on function public\.purge_deleted_accounts/);
+    expect(deletion).toMatch(/to service_role/);
+  });
+});
+
 describe('F10 same-day restore migration', () => {
   const sql = readMigration('0027_daily_log_same_day_restore.sql');
 

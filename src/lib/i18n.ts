@@ -187,6 +187,7 @@ const zh = {
   'daily-log.delete': '删除记录',
   'daily-log.delete-confirm': '删除今天的记录？',
   'daily-log.empty-state': '这一天还没有记录。',
+  'daily-log.partner-readonly': '这是对方的记录，只能查看，不能修改。',
 
   // Logs page
   'logs.title': '全部记录',
@@ -200,7 +201,7 @@ const zh = {
 
   // Data export
   'export.title': '导出数据',
-  'export.description': '将全部记录和周期下载为 CSV。',
+  'export.description': '导出你本人的全部周期与记录（分页拉取，不含亲密活动明文）。',
   'export.button': '下载 CSV',
   'export.exporting': '导出中…',
 
@@ -329,16 +330,16 @@ const zh = {
   'e2ee.unlock.processing': '解锁中…',
   'e2ee.unlock.error': '口令不正确，请重试。',
   'e2ee.disable.confirm':
-    '确定关闭端到端加密？所有已加密的亲密活动数据将被永久清除，无法撤销。',
+    '确定关闭端到端加密？只会永久清除你自己的加密口令与亲密活动密文，不会改动对方的数据。',
 
   // Delete account flow
   'delete-account.title': '删除账号',
   'delete-account.description':
-    '删除账号及全部数据（周期、每日记录、资料）。先软删除 30 天，再永久清除。符合《个人信息保护法》删除权。',
+    '先停用账号（软删除），30 天后永久清除你本人的数据。无法自助恢复。伴侣仍保留自己的历史，且看不到你的内容。',
   'delete-account.button': '删除我的账号',
   'delete-account.dialog.title': '确定删除账号？',
   'delete-account.dialog.body':
-    '此操作会暂时删除你的全部数据（经期、症状、心情、笔记、伴侣关联）。30 天后永久清除且无法恢复。若有伴侣，对方将无法再访问共享数据。',
+    '账号会立即停用，你本人的周期与记录进入软删除。30 天后永久清除，无法自助恢复。伴侣会回到独自使用，并继续看到自己的历史，看不到你的记录。',
   'delete-account.dialog.confirm-label': '请输入「删除」以确认：',
   'delete-account.dialog.confirm-keyword': '删除',
   'delete-account.dialog.confirm': '是的，删除我的账号',
@@ -362,6 +363,10 @@ const zh = {
   'mfa.enroll.success': '两步验证已开启 ✓',
   'mfa.error.invalid-code': '验证码不正确，请重试。',
   'mfa.unenroll.confirm': '确定关闭两步验证？',
+  'mfa.challenge.title': '输入两步验证码',
+  'mfa.challenge.body': '此账号已开启两步验证，请输入验证器中的 6 位验证码。',
+  'mfa.challenge.submit': '继续',
+  'mfa.challenge.sign-out': '退出登录',
 
   // Privacy notice page
   'privacy.title': '隐私与数据',

@@ -4,6 +4,10 @@ import {
   normalizeUsername,
   toSyntheticEmail,
 } from '@/features/auth/lib/username';
+import {
+  ACCOUNT_SOFT_DELETED_MESSAGE,
+  isProfileSoftDeleted,
+} from '@/features/account-deletion/lib/soft-delete';
 
 // Thin wrappers atas Supabase Auth client. Tujuan: type-safe input + central
 // place untuk error handling pattern + future logging/instrumentation hooks.
@@ -17,6 +21,20 @@ export const signInWithUsername = async (input: LoginInput) => {
     password: input.password,
   });
   if (error) throw error;
+
+  const userId = data.user?.id;
+  if (userId) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('deleted_at')
+      .eq('id', userId)
+      .maybeSingle();
+    if (isProfileSoftDeleted(profile)) {
+      await supabase.auth.signOut({ scope: 'global' });
+      throw new Error(ACCOUNT_SOFT_DELETED_MESSAGE);
+    }
+  }
+
   return data;
 };
 

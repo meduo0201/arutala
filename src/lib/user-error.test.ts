@@ -31,6 +31,11 @@ describe('formatUserError', () => {
     expect(formatUserError(new Error('邀请码不存在，请检查后重试。'))).toBe(
       '邀请码不存在，请检查后重试。',
     );
+    expect(
+      formatUserError(
+        new Error('无法关联：双方在同一天都有记录（2026-05-01）。请先删除冲突日期后再试，系统不会覆盖或丢弃任何记录。'),
+      ),
+    ).toContain('无法关联');
   });
 
   it('maps leftover Indonesian RPC copy', () => {

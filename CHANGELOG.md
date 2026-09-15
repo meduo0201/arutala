@@ -23,6 +23,13 @@ this file focuses on what shipped.
 - CSV export prefixes cells that start with `= + - @` (F12).
 - Daily-log by-date queries invalidate when the list changes; realtime
   reconnects after channel errors (F13).
+- MFA AAL2 gate only when a factor is enrolled (F04). Couple accept
+  rejects same-day log conflicts in Chinese (F07 / D2). Each account
+  owns its cycles; unlink rehomes personal history (D1 / D3 / F08).
+- Disabling encryption and log edits only touch the current user's
+  ciphertext (F06 / D4). Account deletion is soft-disable + 30-day
+  purge via a service-role Edge Function, not VITE_* (F09 / D5).
+- CSV is a paginated personal backup without intimate fields (F12 / D6).
 
 ### Fixes
 
